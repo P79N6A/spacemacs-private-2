@@ -218,7 +218,8 @@ Each entry is either:
          (emacs-lisp . t)
          (plantuml . t)
          (C . t)
-         (ditaa . t)))
+         (ditaa . t)
+         (java . t)))
 
 
       (require 'ox-md nil t)
