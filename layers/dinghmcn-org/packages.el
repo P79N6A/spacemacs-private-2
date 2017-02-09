@@ -236,7 +236,10 @@ Each entry is either:
           (ad-set-arg 1 fixed-contents)))
 
       ;; define the refile targets
-    	(setq org-directory "D:/Home/Nutstore/GTD")
+       (setq org-directory (cond
+       ((eq system-type 'window-nt) "D:/Home/Nutstore/GTD")
+       ((eq system-type 'gnu/linux) "/home/dinghmcn/Documents/Nutstore/GTD")
+       ))
       (push  org-directory org-agenda-files)
       (setq org-default-notes-file (concat org-directory "/inbox.org"))
 
@@ -299,5 +302,9 @@ Each entry is either:
     (spacemacs/set-leader-keys-for-major-mode 'deft-mode "q" 'quit-window)
     (setq deft-recursive t)
     (setq deft-extension "org")
-    (setq deft-directory "D:/Home/Nutstore/GTD")))
+    (setq deft-directory (cond
+       ((eq system-type 'window-nt) "D:/Home/Nutstore/GTD")
+       ((eq system-type 'gnu/linux) "/home/dinghmcn/Documents/Nutstore/GTD")
+       ))
+    ))
 ;;; packages.el ends here
