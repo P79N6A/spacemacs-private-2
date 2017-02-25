@@ -331,10 +331,10 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 	;;设置窗口位置为屏库左上角(0,0)
-	(set-frame-position (selected-frame) 300 88)
+	(set-frame-position (selected-frame) 200 80)
 	;;设置宽和高,我的十寸小本是110,33,大家可以调整这个参数来适应自己屏幕大小
-	(set-frame-width (selected-frame) 102)
-	(set-frame-height (selected-frame) 39)
+	(set-frame-width (selected-frame) 128)
+	(set-frame-height (selected-frame) 40)
   )
 
 (defun dotspacemacs/user-config ()

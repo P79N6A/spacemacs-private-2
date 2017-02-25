@@ -114,7 +114,7 @@ Each entry is either:
       ;; (add-to-list 'auto-mode-alist '("\.org\\'" . org-mode))
 
       (setq org-todo-keywords
-            (quote ((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d!/!)")
+            (quote ((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d!/!)" "ABORT(a@/!)")
                     (sequence "WAITING(w@/!)" "SOMEDAY(S)" "|" "CANCELLED(c@/!)" "MEETING(m)" "PHONE(p)"))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       ;; Org clock
@@ -237,7 +237,7 @@ Each entry is either:
 
       ;; define the refile targets
        (setq org-directory (cond
-       ((eq system-type 'window-nt) "D:/Home/Nutstore/GTD")
+       ((eq system-type 'windows-nt) "D:/Home/Nutstore/GTD")
        ((eq system-type 'gnu/linux) "/home/dinghmcn/Documents/Nutstore/GTD")
        ))
       (push  org-directory org-agenda-files)
@@ -252,7 +252,7 @@ Each entry is either:
       ;;http://www.howardism.org/Technical/Emacs/journaling-org.html
       ;;add multi-file journal
       (setq org-capture-templates
-            '(("t" "Todo" entry (file+headline (concat org-directory "/task.org") "Workspace")
+            '(("t" "Todo" entry (file+headline (concat org-directory "/task.org") "Tasks")
                "* TODO [#B] %?\n  %i\n"
                :empty-lines 1)
               ("n" "notes" entry (file+headline (concat org-directory "/inbox.org") "Quick notes")
@@ -261,10 +261,9 @@ Each entry is either:
               ("b" "Blog Ideas" entry (file+headline (concat org-directory "/inbox.org") "Blog Ideas")
                "* TODO [#B] %?\n  %i\n %U"
                :empty-lines 1)
-              ("s" "Code Snippet" entry
-               (file (concat org-directory "/snippet.org"))
+              ("s" "Code Snippet" entry (file (concat org-directory "/snippet.org"))
                "* %?\t%^g\n#+BEGIN_SRC %^{language}\n\n#+END_SRC")
-              ("w" "work" entry (file+headline (concat org-directory "/task.org") "Android & Java")
+              ("w" "work" entry (file+headline (concat org-directory "/task.org") "Workspace")
                "* TODO [#A] %?\n  %i\n %U"
                :empty-lines 1)
               ("f" "Firefox" entry (file+headline (concat org-directory "/inbox.org") "Quick notes")
@@ -274,9 +273,8 @@ Each entry is either:
                "* TODO [#C] %?\n  %i\n %a \n %U"
                :empty-lines 1)
               ("j" "Journal Entry"
-               entry (file+datetree (concat org-directory "/task.org"))
-               "* %?"
-               :empty-lines 1)))
+               entry (file+datetree (concat org-directory "/journal.org"))
+               "* %? [%<%02H:%02M:%02S>]" )))
 
       ;;An entry without a cookie is treated just like priority ' B '.
       ;;So when create new task, they are default 重要且紧急
@@ -288,7 +286,7 @@ Each entry is either:
               ("wc" "不重要但紧急的任务" tags-todo "+PRIORITY=\"C\"")
               ("b" "Blog" tags-todo "BLOG")
               ("p" . "项目安排")
-              ("pw" tags-todo "PROJECT+WORK+CATEGORY=\"Android & Java\"")
+              ("pw" tags-todo "Work")
               ("pl" tags-todo "PROJECT+DREAM+CATEGORY=\"dinghmcn\"")
               ("W" "Weekly Review"
                ((stuck "") ;; review stuck projects as designated by org-stuck-projects
@@ -303,7 +301,7 @@ Each entry is either:
     (setq deft-recursive t)
     (setq deft-extension "org")
     (setq deft-directory (cond
-       ((eq system-type 'window-nt) "D:/Home/Nutstore/GTD")
+       ((eq system-type 'windows-nt) "D:/Home/Nutstore/GTD")
        ((eq system-type 'gnu/linux) "/home/dinghmcn/Documents/Nutstore/GTD")
        ))
     ))
