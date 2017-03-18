@@ -237,7 +237,7 @@ Each entry is either:
 
       ;; define the refile targets
        (setq org-directory (cond
-       ((eq system-type 'windows-nt) "D:/Home/Nutstore/GTD")
+       ((eq system-type 'windows-nt) "D:/Home/Documents/Nutstore/GTD")
        ((eq system-type 'gnu/linux) "/home/dinghmcn/Documents/Nutstore/GTD")
        ))
       (push  org-directory org-agenda-files)
