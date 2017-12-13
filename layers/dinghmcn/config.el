@@ -14,8 +14,8 @@
        )
  org-agenda-dir (concat home-dir "Documents/Nutstore/GTD")
  deft-dir (concat home-dir "Documents/Nutstore/Notes")
- blog-admin-dir (concat home-dir "Documents/Blog")
- blog-dir blog-admin-dir)
+ blog-dir (concat home-dir "Documents/Blog")
+ blog-admin-dir blog-dir)
 
 ;;load sensitive data
 ;; or (like spacemacs init.el)put the above variable into it ,then the own value separated from public config

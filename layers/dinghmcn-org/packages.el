@@ -16,9 +16,7 @@
     (org :location built-in)
     org-pomodoro
     deft
-    (blog-admin :location (recipe
-                           :fetcher github
-                           :repo "codefalling/blog-admin"))
+    blog-admin
     )
   )
 
@@ -27,10 +25,11 @@
     :defer t
     :commands blog-admin-start
     :init
+    :config
     (progn
       ;; do your configuration here
       (setq blog-admin-backend-type 'hexo
-            blog-admin-backend-path blog-dir
+            blog-admin-backend-path blog-admin-dir
             blog-admin-backend-new-post-in-drafts t
             blog-admin-backend-new-post-with-same-name-dir nil
             blog-admin-backend-hexo-config-file "_config.yml"

@@ -71,7 +71,8 @@ This function should only modify configuration layer settings."
      ivy
      java
      latex
-     markdown
+     markdown     
+     neotree
      (org :variables
             org-enable-github-support t
             org-want-todo-bindings t)
@@ -130,6 +131,13 @@ It should only modify the values of Spacemacs settings."
    ;; Maximum allowed time in seconds to contact an ELPA repository.
    ;; (default 5)
    dotspacemacs-elpa-timeout 5
+   ;; If non-nil then Spacelpa repository is the primary source to install
+   ;; a locked version of packages. If nil then Spacemacs will install the lastest
+   ;; version of packages from MELPA. (default nil)
+   dotspacemacs-use-spacelpa nil
+   ;; If non-nil then verify the signature for downloaded Spacelpa archives.
+   ;; (default nil)
+   dotspacemacs-verify-spacelpa-archives nil
    ;; If non-nil then spacemacs will check for updates at startup
    ;; when the current branch is not `develop'. Note that checking for
    ;; new versions works via git commands, thus it calls GitHub services
@@ -137,8 +145,8 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-check-for-update nil
    ;; If non-nil, a form that evaluates to a package directory. For example, to
    ;; use different package directories for different Emacs versions, set this
-   ;; to `emacs-version'. (default nil)
-   dotspacemacs-elpa-subdirectory nil
+   ;; to `emacs-version'. (default 'emacs-version)
+   dotspacemacs-elpa-subdirectory 'emacs-version
    ;; One of `vim', `emacs' or `hybrid'.
    ;; `hybrid' is like `vim' except that `insert state' is replaced by the
    ;; `hybrid state' with `emacs' key bindings. The value can also be a list
@@ -162,7 +170,7 @@ It should only modify the values of Spacemacs settings."
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
    dotspacemacs-startup-lists '((recents . 5)
-                                (projects . 7))
+                                (bookmarks . 8))
    ;; True if the home buffer should respond to resize events. (default t)
    dotspacemacs-startup-buffer-responsive t
    ;; Default major mode of the scratch buffer (default `text-mode')
@@ -170,15 +178,15 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(solarized-light
-                         solarized-dark)
+   dotspacemacs-themes '(spacemacs-light
+                         spacemacs-dark)
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 14
+                               :size 13
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -206,13 +214,13 @@ It should only modify the values of Spacemacs settings."
    ;; works in the GUI. (default nil)
    dotspacemacs-distinguish-gui-tab nil
    ;; If non-nil `Y' is remapped to `y$' in Evil states. (default nil)
-   dotspacemacs-remap-Y-to-y$ t
+   dotspacemacs-remap-Y-to-y$ nil
    ;; If non-nil, the shift mappings `<' and `>' retain visual state if used
    ;; there. (default t)
    dotspacemacs-retain-visual-state-on-shift t
    ;; If non-nil, `J' and `K' move lines up and down when in visual mode.
    ;; (default nil)
-   dotspacemacs-visual-line-move-text t
+   dotspacemacs-visual-line-move-text nil
    ;; If non-nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
    ;; (default nil)
    dotspacemacs-ex-substitute-global nil
@@ -324,7 +332,7 @@ It should only modify the values of Spacemacs settings."
 													      :size-limit-kb 1000)
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
-   dotspacemacs-folding-method 'origami
+   dotspacemacs-folding-method 'evil
    ;; If non-nil `smartparens-strict-mode' will be enabled in programming modes.
    ;; (default nil)
    dotspacemacs-smartparens-strict-mode nil
@@ -389,7 +397,7 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-(setq configuration-layer--elpa-archives
+  (setq configuration-layer--elpa-archives
         '(("melpa-cn" . "https://elpa.emacs-china.org/melpa/")
           ("org-cn"   . "https://elpa.emacs-china.org/org/")
           ("gnu-cn"   . "https://elpa.emacs-china.org/gnu/")))
@@ -480,22 +488,6 @@ before packages are loaded."
   (spacemacs/set-leader-keys "otm" 'zilongshanren/toggle-major-mode)
 
   ;; (add-hook 'text-mode-hook 'spacemacs/toggle-spelling-checking-on)
-
-  ;; https://github.com/syl20bnr/spacemacs/issues/7749
-  (defun spacemacs/ivy-persp-switch-project (arg)
-    (interactive "P")
-    (ivy-read "Switch to Project Perspective: "
-              (if (projectile-project-p)
-                  (cons (abbreviate-file-name (projectile-project-root))
-                        (projectile-relevant-known-projects))
-                projectile-known-projects)
-              :action (lambda (project)
-                        (let ((persp-reset-windows-on-nil-window-conf t))
-                          (persp-switch project)
-                          (let ((projectile-completion-system 'ivy)
-                                (old-default-directory default-directory))
-                            (projectile-switch-project-by-name project)
-                            (setq default-directory old-default-directory))))))
   
 	(setq powerline-default-separator 'zigzag)
 	;; 编码设置 begin
@@ -523,8 +515,7 @@ before packages are loaded."
 	(prefer-coding-system 'utf-8-unix)
 	;; 编码设置 end
  	)
-(setq custom-file (expand-file-name "custom.el" dotspacemacs-directory))
-(load custom-file 'no-error 'no-message)
+
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
 (defun dotspacemacs/emacs-custom-settings ()
@@ -539,7 +530,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (youdao-dictionary chinese-word-at-point pyim pyim-basedict pangu-spacing find-by-pinyin-dired ace-pinyin pinyinlib ox-gfm orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download org-brain gnuplot evil-org unfill realgud test-simple loc-changes load-relative mwim disaster company-c-headers cmake-ide levenshtein clang-format zeal-at-point yapfify xterm-color ws-butler wrap-region winum which-key web-mode volatile-highlights visual-regexp-steroids visual-regexp vi-tilde-fringe uuidgen use-package toc-org tiny tagedit symon string-inflection spaceline powerline smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode popwin pip-requirements persp-mode peep-dired pcre2el password-generator paredit paradox spinner org-plus-contrib org-bullets open-junk-file nodejs-repl neotree multiple-cursors multi-term move-text mmm-mode meghanada markdown-toc magit-gitflow magit-gh-pulls macrostep lorem-ipsum live-py-mode lispy linum-relative link-hint less-css-mode info+ indent-guide impatient-mode hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation highlight-global hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mode-manager helm-make helm-gitignore helm-github-stars helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haml-mode gradle-mode google-translate golden-ratio github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md fuzzy flx-ido find-file-in-project fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu etags-select eshell-z eshell-prompt-extras esh-help ensime emmet-mode elisp-slime-nav editorconfig dumb-jump discover-my-major diminish diff-hl define-word cython-mode company-web company-statistics company-emacs-eclim company-anaconda column-enforce-mode color-identifiers-mode cmake-font-lock clean-aindent-mode browse-at-remote blog-admin bind-key auto-yasnippet auto-highlight-symbol auto-compile ahk-mode aggressive-indent adaptive-wrap ace-link ace-jump-helm-line ac-ispell 4clojure))))
+    (mmm-mode live-py-mode auctex counsel markdown-mode zeal-at-point yapfify xterm-color ws-butler wrap-region winum which-key wgrep web-mode volatile-highlights visual-regexp-steroids vi-tilde-fringe uuidgen use-package unfill toc-org tiny tagedit symon swiper string-inflection spaceline smex smeargle slim-mode shell-pop scss-mode sayid sass-mode restart-emacs realgud ranger rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode prodigy popwin plantuml-mode pip-requirements persp-mode peep-dired pcre2el password-generator paradox ox-gfm orgit org-projectile org-present org-pomodoro org-download org-bullets org-brain opencl-mode open-junk-file neotree mwim multi-term move-text meghanada markdown-toc magit-gitflow magit-gh-pulls macrostep lorem-ipsum linum-relative link-hint less-css-mode ivy-purpose ivy-hydra info+ indent-guide impatient-mode ibuffer-projectile hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation highlight-global hide-comnt help-fns+ helm-make helm-github-stars helm-ag graphviz-dot-mode gradle-mode google-translate golden-ratio gnuplot glsl-mode gitignore-mode github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md ggtags fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido find-file-in-project fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime engine-mode emmet-mode elisp-slime-nav editorconfig dumb-jump discover-my-major disaster diminish diff-hl deft define-word cython-mode cuda-mode counsel-projectile counsel-dash company-web company-statistics company-emacs-eclim company-c-headers company-auctex company-anaconda column-enforce-mode color-identifiers-mode cmake-mode cmake-ide clojure-snippets clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu browse-at-remote blog-admin auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ahk-mode aggressive-indent adaptive-wrap ace-window ace-link ac-ispell 4clojure))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
