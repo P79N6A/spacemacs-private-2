@@ -64,11 +64,9 @@
 ;; (set-default 'imenu-auto-rescan t)
 
 ;; https://www.reddit.com/r/emacs/comments/4c0mi3/the_biggest_performance_improvement_to_emacs_ive/
-(remove-hook 'find-file-hooks 'vc-find-file-hook)
+;; (remove-hook 'find-file-hooks 'vc-find-file-hook)
 ;; https://stackoverflow.com/questions/5748814/how-does-one-disable-vc-git-in-emacs
 ;; this settings will cause command `vc-annotate` failed.
-;; 如果把 vc-handled-backends去掉，那么 vc-follow-symlinks 这个选项就会失效
-;; 进而，如果你访问一个在版本控制里面的alias的话，它不会自动去访问原文件，这个是非常不爽的
 ;; (setq vc-handled-backends ())
 
 
