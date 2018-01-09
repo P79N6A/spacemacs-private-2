@@ -157,7 +157,7 @@
 (spacemacs/set-leader-keys "ols" 'dinghmcn/save-my-layout)
 (spacemacs/set-leader-keys "ob" 'popwin:display-last-buffer)
 (spacemacs/set-leader-keys "oy" 'youdao-dictionary-search-at-point+)
-(spacemacs/set-leader-keys "bM" 'spacemacs/switch-to-messages-buffer)
+(spacemacs/set-leader-keys "bM" 'view-echo-area-messages)
 
 (bind-key* "s-p" 'find-file-in-project)
 (spacemacs/set-leader-keys "os" 'dinghmcn/search-in-fireball)
