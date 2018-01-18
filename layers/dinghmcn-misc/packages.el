@@ -935,9 +935,7 @@ Search for a search tool in the order provided by `dotspacemacs-search-tools'."
   (progn
     (with-eval-after-load 'projectile
       (progn
-        (setq projectile-completion-system 'ivy)
-        (add-to-list 'projectile-other-file-alist '("html" "js"))
-        (add-to-list 'projectile-other-file-alist '("js" "html"))))
+        (setq projectile-completion-system 'ivy)))
 
     (defvar my-simple-todo-regex "\\<\\(FIXME\\|TODO\\|BUG\\):")
 

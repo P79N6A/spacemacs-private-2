@@ -19,3 +19,12 @@
 
 (add-hook 'org-mode-hook #'dinghmcn/org-ispell)
 (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+(add-hook 'org-mode-hook (lambda()
+                         (define-key
+                           evil-normal-state-local-map
+                           (kbd "M-RET")
+                           #'org-meta-return)
+                         (define-key
+                           evil-insert-state-local-map
+                           (kbd "M-RET")
+                           #'org-meta-return)))

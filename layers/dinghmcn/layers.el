@@ -11,7 +11,7 @@
 
 (configuration-layer/declare-layers '(
                                       dinghmcn-misc
-                                      ;;dinghmcn-programming
+                                      dinghmcn-programming
                                       dinghmcn-ui
                                       dinghmcn-org
                                       dinghmcn-better-defaults

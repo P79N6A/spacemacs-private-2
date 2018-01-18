@@ -403,26 +403,9 @@ unwanted space when exporting org-mode to html."
                                        level
                                        (mapconcat #'number-to-string numbers ".")))
                                  full-text)
-                                level)
-                        ;; When there is no section, pretend there is an
-                        ;; empty one to get the correct <div
-                        ;; class="outline-...> which is needed by
-                        ;; `org-info.js'.
-                        (if (eq (org-element-type first-content) 'section) contents
-                          (concat (org-html-section first-content "" info) contents))
-                        (org-html--container headline info)))))))
+                                level)))))))
 
       )))
-
-(defun dinghmcn-org/init-org-mac-link ()
-  (use-package org-mac-link
-    :commands org-mac-grab-link
-    :init
-    (progn
-      (add-hook 'org-mode-hook
-                (lambda ()
-                  (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link))))
-    :defer t))
 
 (defun dinghmcn-org/post-init-ox-reveal ()
   (setq org-reveal-root "file:///Users/guanghui/.emacs.d/reveal-js"))
