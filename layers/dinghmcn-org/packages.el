@@ -13,8 +13,9 @@
 
 (defconst dinghmcn-org-packages
   '(
-    (org :location built-in)
-    org-pomodoro
+    ;;(org :location built-in)
+    org
+    ;;org-pomodoro
     deft
     blog-admin
     )
@@ -33,7 +34,7 @@
             blog-admin-backend-new-post-in-drafts t
             blog-admin-backend-new-post-with-same-name-dir nil
             blog-admin-backend-hexo-config-file "_config.yml"
-            ) 
+            )
       (add-hook 'blog-admin-backend-after-new-post-hook 'find-file)
       )))
 
@@ -51,7 +52,7 @@
   (add-hook 'org-mode-hook (lambda () (spacemacs/toggle-line-numbers-off)) 'append)
   (with-eval-after-load 'org
     (progn
-      
+
       (spacemacs|disable-company org-mode)
       (spacemacs/set-leader-keys-for-major-mode 'org-mode
         "," 'org-priority)

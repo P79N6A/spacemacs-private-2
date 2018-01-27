@@ -51,10 +51,8 @@ values."
      (colors :variables
              colors-enable-nyan-cat-progress-bar t
              colors-colorize-identifiers 'all)
-     dash
      deft
      ;; docker
-     dinghmcn
      emacs-lisp
      (git :variables
           git-magit-status-fullscreen t
@@ -73,14 +71,14 @@ values."
      ivy
      java
      latex
-     markdown     
+     markdown
      ;;neotree
      (org :variables
             org-enable-github-support t
             org-want-todo-bindings t)
      plantuml
      prodigy
-     (python :variables 
+     (python :variables
              python-test-runner '(pytest nose)
              python-enable-yapf-format-on-save t)
      ranger
@@ -96,6 +94,8 @@ values."
                       syntax-checking-enable-tooltips nil)
      version-control
      (vinegar :variables vinegar-reuse-dired-buffer t)
+     yaml
+     dinghmcn
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -307,7 +307,7 @@ values."
    ;;                       text-mode
    ;;   :size-limit-kb 1000)
    ;; (default nil)
-   dotspacemacs-line-numbers '(:relative nil  
+   dotspacemacs-line-numbers '(:relative nil
 													      :disabled-for-modes dired-mode
 													                          doc-view-mode
 													                          markdown-mode
@@ -331,7 +331,7 @@ values."
    dotspacemacs-highlight-delimiters 'all
    ;; If non nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
-   dotspacemacs-persistent-server nil
+   dotspacemacs-persistent-server t
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
    ;; (default '("ag" "pt" "ack" "grep"))
@@ -386,6 +386,9 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+  ;;解决F1显示helm buffer报错
+  (with-eval-after-load 'helm
+      (setq helm-display-function 'helm-default-display-buffer))
   ;;解决org表格里面中英文对齐的问题
   (when (configuration-layer/layer-usedp 'chinese)
     (when (and (spacemacs/system-is-mac) window-system)
@@ -447,7 +450,7 @@ you should place your code here."
   (spacemacs/set-leader-keys "otm" 'zilongshanren/toggle-major-mode)
 
   ;; (add-hook 'text-mode-hook 'spacemacs/toggle-spelling-checking-on)
-  
+
 	(setq powerline-default-separator 'zigzag)
 	;; 编码设置 begin
 	(set-language-environment 'Chinese-GB)
@@ -489,7 +492,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (org-brain meghanada groovy-mode define-word counsel company yasnippet goto-chg helm helm-core avy markdown-mode projectile org-plus-contrib magit f cider ivy zeal-at-point yapfify xterm-color ws-butler wrap-region winum which-key wgrep web-mode volatile-highlights visual-regexp-steroids vi-tilde-fringe uuidgen use-package unfill toc-org tiny tagedit symon swiper string-inflection spaceline smex smeargle slim-mode shell-pop scss-mode sayid sass-mode restart-emacs realgud ranger rainbow-mode rainbow-identifiers rainbow-delimiters queue pyvenv pytest pyenv-mode py-isort pug-mode prodigy popwin plantuml-mode pip-requirements persp-mode peep-dired pcre2el password-generator paradox ox-gfm overseer orgit org-projectile org-present org-pomodoro org-download org-bullets opencl-mode open-junk-file neotree nameless mwim mvn multi-term move-text mmm-mode maven-test-mode markdown-toc magit-gitflow magit-gh-pulls macrostep lorem-ipsum live-py-mode linum-relative link-hint less-css-mode ivy-purpose ivy-hydra info+ indent-guide impatient-mode ibuffer-projectile hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation highlight-global hide-comnt help-fns+ helm-make helm-github-stars helm-ag groovy-imports graphviz-dot-mode gradle-mode google-translate google-c-style golden-ratio gnuplot glsl-mode gitignore-mode github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist ghub gh-md ggtags fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido find-file-in-project fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime engine-mode emmet-mode elisp-slime-nav editorconfig dumb-jump discover-my-major disaster diminish diff-hl deft cython-mode cuda-mode counsel-projectile counsel-gtags counsel-dash company-web company-statistics company-emacs-eclim company-c-headers company-auctex company-anaconda column-enforce-mode color-identifiers-mode cmake-mode cmake-ide clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu browse-at-remote blog-admin auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ahk-mode aggressive-indent adaptive-wrap ace-window ace-link ac-ispell 4clojure))))
+    (org-brain meghanada groovy-mode define-word counsel company yasnippet goto-chg helm helm-core avy markdown-mode projectile org-plus-contrib magit f cider ivy zeal-at-point yapfify xterm-color ws-butler wrap-region winum which-key wgrep web-mode volatile-highlights visual-regexp-steroids vi-tilde-fringe uuidgen use-package unfill toc-org tiny tagedit symon swiper string-inflection spaceline smex smeargle slim-mode shell-pop scss-mode sayid sass-mode restart-emacs realgud ranger rainbow-mode rainbow-identifiers rainbow-delimiters queue pyvenv pytest pyenv-mode py-isort pug-mode prodigy popwin plantuml-mode pip-requirements persp-mode peep-dired pcre2el password-generator paradox ox-gfm overseer orgit org-present org-pomodoro org-download org-bullets opencl-mode open-junk-file neotree nameless mwim mvn multi-term move-text mmm-mode maven-test-mode markdown-toc magit-gitflow magit-gh-pulls macrostep lorem-ipsum live-py-mode linum-relative link-hint less-css-mode ivy-purpose ivy-hydra info+ indent-guide impatient-mode ibuffer-projectile hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation highlight-global hide-comnt help-fns+ helm-make helm-github-stars helm-ag groovy-imports graphviz-dot-mode gradle-mode google-translate google-c-style golden-ratio gnuplot glsl-mode gitignore-mode github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist ghub gh-md ggtags fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido find-file-in-project fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime engine-mode emmet-mode elisp-slime-nav editorconfig dumb-jump discover-my-major disaster diminish diff-hl deft cython-mode cuda-mode counsel-projectile counsel-gtags counsel-dash company-web company-statistics company-emacs-eclim company-c-headers company-auctex company-anaconda column-enforce-mode color-identifiers-mode cmake-mode cmake-ide clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu browse-at-remote blog-admin auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ahk-mode aggressive-indent adaptive-wrap ace-window ace-link ac-ispell 4clojure))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -504,7 +507,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (flycheck powerline markdown-mode clojure-mode magit-popup gh with-editor projectile ghub counsel helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-gtags helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet flyspell-correct-helm ace-jump-helm-line yasnippet evil goto-chg dash-functional alert magit git-commit async f dash cider helm evil-surround swiper helm-core ivy marshal org-plus-contrib zeal-at-point yapfify xterm-color ws-butler wrap-region winum which-key wgrep web-mode volatile-highlights visual-regexp-steroids vi-tilde-fringe uuidgen use-package unfill toc-org tiny tagedit spaceline smex smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs ranger rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode prodigy popwin plantuml-mode pip-requirements persp-mode peep-dired pcre2el paradox ox-gfm orgit org-projectile org-present org-pomodoro org-download org-bullets open-junk-file neotree mwim multi-term move-text mmm-mode markdown-toc magit-gitflow magit-gh-pulls macrostep lorem-ipsum live-py-mode linum-relative link-hint less-css-mode ivy-hydra info+ indent-guide ibuffer-projectile hy-mode hungry-delete htmlize ht hl-todo highlight-parentheses highlight-numbers highlight-indentation highlight-global hide-comnt help-fns+ helm-make helm-github-stars helm-ag graphviz-dot-mode google-translate golden-ratio gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md ggtags fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido find-file-in-project fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eshell-z eshell-prompt-extras esh-help engine-mode emmet-mode elisp-slime-nav dumb-jump discover-my-major disaster diminish diff-hl deft define-word cython-mode counsel-projectile counsel-dash company-web company-statistics company-emacs-eclim company-c-headers company-auctex company-anaconda column-enforce-mode color-identifiers-mode cmake-mode clojure-snippets clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu blog-admin auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ahk-mode aggressive-indent adaptive-wrap ace-window ace-link ac-ispell 4clojure))))
+    (epl highlight yaml-mode smartparens flycheck powerline markdown-mode clojure-mode magit-popup gh with-editor projectile ghub counsel helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-gtags helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet flyspell-correct-helm ace-jump-helm-line yasnippet evil goto-chg dash-functional alert magit git-commit async f dash cider helm evil-surround swiper helm-core ivy marshal org-plus-contrib zeal-at-point yapfify xterm-color ws-butler wrap-region winum which-key wgrep web-mode volatile-highlights visual-regexp-steroids vi-tilde-fringe uuidgen use-package unfill toc-org tiny tagedit spaceline smex smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs ranger rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode prodigy popwin plantuml-mode pip-requirements persp-mode peep-dired pcre2el paradox ox-gfm orgit org-projectile org-present org-pomodoro org-download org-bullets open-junk-file neotree mwim multi-term move-text mmm-mode markdown-toc magit-gitflow magit-gh-pulls macrostep lorem-ipsum live-py-mode linum-relative link-hint less-css-mode ivy-hydra info+ indent-guide ibuffer-projectile hy-mode hungry-delete htmlize ht hl-todo highlight-parentheses highlight-numbers highlight-indentation highlight-global hide-comnt help-fns+ helm-make helm-github-stars helm-ag graphviz-dot-mode google-translate golden-ratio gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md ggtags fuzzy flyspell-correct-ivy flycheck-pos-tip flx-ido find-file-in-project fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eshell-z eshell-prompt-extras esh-help engine-mode emmet-mode elisp-slime-nav dumb-jump discover-my-major disaster diminish diff-hl deft define-word cython-mode counsel-projectile counsel-dash company-web company-statistics company-emacs-eclim company-c-headers company-auctex company-anaconda column-enforce-mode color-identifiers-mode cmake-mode clojure-snippets clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu blog-admin auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ahk-mode aggressive-indent adaptive-wrap ace-window ace-link ac-ispell 4clojure))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
