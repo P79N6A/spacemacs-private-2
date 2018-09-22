@@ -104,7 +104,7 @@
             "scheme" "sqlite")))
      (list (ido-completing-read "Source code type: " src-code-types))))
   (progn
-    (newline-and-indent)
+    ;;(newline-and-indent)
     (insert (format "#+BEGIN_SRC %s\n" src-code-type))
     (newline-and-indent)
     (insert "#+END_SRC\n")

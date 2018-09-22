@@ -10,7 +10,7 @@
 (setq-default
  home-dir (cond
        ((eq system-type 'windows-nt) "D:/Home/")
-       ((eq system-type 'gnu/linux) "/home/dinghmcn/Documents/Nutstore/")
+       ((eq system-type 'gnu/linux) "/home/dinghmcn/")
        )
  org-agenda-dir (concat home-dir "Documents/Nutstore/GTD")
  deft-dir (concat home-dir "Documents/Nutstore/Notes")

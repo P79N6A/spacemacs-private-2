@@ -13,11 +13,11 @@
 
 (defconst dinghmcn-org-packages
   '(
-    ;;(org :location built-in)
-    org
-    ;;org-pomodoro
+    (org :location built-in)
+    org-pomodoro
     deft
     blog-admin
+    hexo
     )
   )
 
@@ -32,11 +32,18 @@
       (setq blog-admin-backend-type 'hexo
             blog-admin-backend-path blog-admin-dir
             blog-admin-backend-new-post-in-drafts t
-            blog-admin-backend-new-post-with-same-name-dir nil
+            blog-admin-backend-new-post-with-same-name-dir t
             blog-admin-backend-hexo-config-file "_config.yml"
             )
       (add-hook 'blog-admin-backend-after-new-post-hook 'find-file)
       )))
+      
+(defun dinghmcn-org/init-hexo ()
+    (progn
+      ;; do your configuration here
+      (setq 
+        hexo-posix-compatible-shell-file-path "/bin/zsh"
+        )))
 
 (defun dinghmcn-org/post-init-org-pomodoro ()
   (progn
@@ -99,8 +106,7 @@
       ;; (add-to-list 'auto-mode-alist '("\.org\\'" . org-mode))
 
       (setq org-todo-keywords
-            (quote ((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d!/!)" "ABORT(a@/!)")
-                    (sequence "WAITING(w@/!)" "SOMEDAY(S)" "|" "CANCELLED(c@/!)" "MEETING(m)" "PHONE(p)"))))
+            '((sequence "TODO(t)" "STARTED(s)" "WAITING(w@/!)" "SOMEDAY(S)" "|" "DONE(d!/!)" "ABORT(a@/!)")))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       ;; Org clock
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -119,7 +125,7 @@
                                   ;; keybinding for inserting code blocks
                                   (local-set-key (kbd "C-c i s")
                                                  'dinghmcn/org-insert-src-block)))
-      (require 'ox-publish)
+
       (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
                                         [NO-DEFAULT-PACKAGES]
                                         \\usepackage[utf8]{inputenc}
@@ -193,40 +199,28 @@
 
       (org-babel-do-load-languages
        'org-babel-load-languages
-       '((perl . t)
-         (ruby . t)
-         (sh . t)
-         (dot . t)
-         (js . t)
-         (latex .t)
-         (python . t)
-         (emacs-lisp . t)
-         (plantuml . t)
+       '(
+         (shell . t)
          (C . t)
          (ditaa . t)
-         (java . t)))
-
-
-      (require 'ox-md nil t)
-      ;; copy from chinese layer
-      (defadvice org-html-paragraph (before org-html-paragraph-advice
-                                            (paragraph contents info) activate)
-        "Join consecutive Chinese lines into a single long line without
-unwanted space when exporting org-mode to html."
-        (let* ((origin-contents (ad-get-arg 1))
-               (fix-regexp "[[:multibyte:]]")
-               (fixed-contents
-                (replace-regexp-in-string
-                 (concat
-                  "\\(" fix-regexp "\\) *\n *\\(" fix-regexp "\\)") "\\1\\2" origin-contents)))
-          (ad-set-arg 1 fixed-contents)))
+         (dot . t)
+         (emacs-lisp . t)
+         (java . t)
+         (latex . t)
+         (makefile . t)
+         (org . t)
+         (perl . t)
+         (plantuml . t)
+         (python . t)
+         ))
 
       ;; define the refile targets
       (setq org-agenda-file-inbox (expand-file-name "inbox.org" org-agenda-dir))
       (setq org-agenda-file-task (expand-file-name "task.org" org-agenda-dir))
-      (setq org-agenda-file-journal (expand-file-name "journal.org" org-agenda-dir))
+      (setq org-agenda-file-diary (expand-file-name "diary.org" org-agenda-dir))
       (setq org-agenda-file-code-snippet (expand-file-name "snippet.org" org-agenda-dir))
-      (setq org-default-notes-file (expand-file-name "task.org" org-agenda-dir))
+      (setq org-agenda-file-project (expand-file-name "project.org" org-agenda-dir))
+      (setq org-default-notes-file (expand-file-name "inbox.org" org-agenda-dir))
       (setq org-agenda-files (list org-agenda-dir))
 
       (with-eval-after-load 'org-agenda
@@ -244,25 +238,25 @@ unwanted space when exporting org-mode to html."
               ("n" "notes" entry (file+headline org-agenda-file-inbox "Quick notes")
                "* %?\n  %i\n %U"
                :empty-lines 1)
-              ("b" "Blog Ideas" entry (file+headline org-agenda-file-inbox "Blog Ideas")
+              ("i" "Ideas" entry (file+headline org-agenda-file-task "Ideas")
                "* TODO [#B] %?\n  %i\n %U"
                :empty-lines 1)
               ("s" "Code Snippet" entry
                (file org-agenda-file-code-snippet)
                "* %?\t%^g\n#+BEGIN_SRC %^{language}\n\n#+END_SRC")
-              ("w" "work" entry (file+headline org-agenda-file-task "Workspace")
+              ("w" "work" entry (file+headline org-agenda-file-project "Workspace")
                "* TODO [#A] %?\n  %i\n %U"
                :empty-lines 1)
-              ("c" "Chrome" entry (file+headline org-agenda-file-inbox "Quick notes")
-               "* TODO [#C] %?\n %(dinghmcn/retrieve-chrome-current-tab-url)\n %i\n %U"
-               :empty-lines 1)
+              ;;("c" "Chrome" entry (file+headline org-agenda-file-inbox "Quick notes")
+              ;; "* TODO [#C] %?\n %(dinghmcn/retrieve-chrome-current-tab-url)\n %i\n %U"
+              ;; :empty-lines 1)
               ("l" "links" entry (file+headline org-agenda-file-inbox "Quick notes")
                "* TODO [#C] %?\n  %i\n %a \n %U"
                :empty-lines 1)
-              ("j" "Journal Entry"
-               entry (file+datetree org-agenda-file-journal)
+              ("d" "Diary Entry"
+               entry (file+datetree org-agenda-file-diary)
                "* %? [%<%02H:%02M:%02S>]"
-               :empty-lines 1)))
+               :empty-lines 0)))
 
       ;;An entry without a cookie is treated just like priority ' B '.
       ;;So when create new task, they are default 重要且紧急
@@ -272,7 +266,8 @@ unwanted space when exporting org-mode to html."
               ("wa" "重要且紧急的任务" tags-todo "+PRIORITY=\"A\"")
               ("wb" "重要且不紧急的任务" tags-todo "-Weekly-Monthly-Daily+PRIORITY=\"B\"")
               ("wc" "不重要且紧急的任务" tags-todo "+PRIORITY=\"C\"")
-              ("b" "Blog" tags-todo "BLOG")
+              ("wd" "不重要且不紧急的任务" tags-todo "+PRIORITY=\"D\"")
+              ;;("b" "Blog" tags-todo "BLOG")
               ("p" . "项目安排")
               ("pw" tags-todo "Work")
               ("pl" tags-todo "PROJECT+DREAM+CATEGORY=\"dinghmcn\"")
@@ -280,52 +275,6 @@ unwanted space when exporting org-mode to html."
                ((stuck "") ;; review stuck projects as designated by org-stuck-projects
                 (tags-todo "PROJECT") ;; review all projects (assuming you use todo keywords to designate projects)
                 ))))
-
-      (defvar dinghmcn-website-html-preamble
-        "<div class='nav'>
-            <ul>
-                <li><a href='http://dinghmcn.com'>博客</a></li>
-                <li><a href='/index.html'>Wiki目录</a></li>
-            </ul>
-        </div>")
-      (defvar dinghmcn-website-html-blog-head
-        "<link rel='stylesheet' href='css/site.css' type='text/css'/> \n
-        <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/worg.css\"/>")
-      (setq org-publish-project-alist
-            `(
-              ("blog-notes"
-               :base-directory "~/org-notes"
-               :base-extension "org"
-               :publishing-directory "~/org-notes/public_html/"
-
-               :recursive t
-               :html-head , dinghmcn-website-html-blog-head
-               :publishing-function org-html-publish-to-html
-               :headline-levels 4       ; Just the default for this project.
-               :auto-preamble t
-               :exclude "gtd.org"
-               :exclude-tags ("ol" "noexport")
-               :section-numbers nil
-               :html-preamble ,dinghmcn-website-html-preamble
-               :author "dinghmcn"
-               :email "guanghui8827@gmail.com"
-               :auto-sitemap t          ; Generate sitemap.org automagically...
-               :sitemap-filename "index.org" ; ... call it sitemap.org (it's the default)...
-               :sitemap-title "我的wiki"     ; ... with title 'Sitemap'.
-               :sitemap-sort-files anti-chronologically
-               :sitemap-file-entry-format "%t" ; %d to output date, we don't need date here
-               )
-              ("blog-static"
-               :base-directory "~/org-notes"
-               :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
-               :publishing-directory "~/org-notes/public_html/"
-               :recursive t
-               :publishing-function org-publish-attachment
-               )
-              ("blog" :components ("blog-notes" "blog-static"))))
-
-
-
       (add-hook 'org-after-todo-statistics-hook 'dinghm/org-summary-todo)
       ;; used by dinghm/org-clock-sum-today-by-tags
 
@@ -333,84 +282,7 @@ unwanted space when exporting org-mode to html."
       (spacemacs/set-leader-keys-for-major-mode 'org-mode
         "tl" 'org-toggle-link-display)
       (define-key evil-normal-state-map (kbd "C-c C-w") 'org-refile)
-
-      ;; hack for org headline toc
-      (defun org-html-headline (headline contents info)
-        "Transcode a HEADLINE element from Org to HTML.
-        CONTENTS holds the contents of the headline.  INFO is a plist
-        holding contextual information."
-        (unless (org-element-property :footnote-section-p headline)
-          (let* ((numberedp (org-export-numbered-headline-p headline info))
-                 (numbers (org-export-get-headline-number headline info))
-                 (section-number (and numbers
-                                      (mapconcat #'number-to-string numbers "-")))
-                 (level (+ (org-export-get-relative-level headline info)
-                           (1- (plist-get info :html-toplevel-hlevel))))
-                 (todo (and (plist-get info :with-todo-keywords)
-                            (let ((todo (org-element-property :todo-keyword headline)))
-                              (and todo (org-export-data todo info)))))
-                 (todo-type (and todo (org-element-property :todo-type headline)))
-                 (priority (and (plist-get info :with-priority)
-                                (org-element-property :priority headline)))
-                 (text (org-export-data (org-element-property :title headline) info))
-                 (tags (and (plist-get info :with-tags)
-                            (org-export-get-tags headline info)))
-                 (full-text (funcall (plist-get info :html-format-headline-function)
-                                     todo todo-type priority text tags info))
-                 (contents (or contents ""))
-                 (ids (delq nil
-                            (list (org-element-property :CUSTOM_ID headline)
-                                  (org-export-get-reference headline info)
-                                  (org-element-property :ID headline))))
-                 (preferred-id (car ids))
-                 (extra-ids
-                  (mapconcat
-                   (lambda (id)
-                     (org-html--anchor
-                      (if (org-uuidgen-p id) (concat "ID-" id) id)
-                      nil nil info))
-                   (cdr ids) "")))
-            (if (org-export-low-level-p headline info)
-                ;; This is a deep sub-tree: export it as a list item.
-                (let* ((type (if numberedp 'ordered 'unordered))
-                       (itemized-body
-                        (org-html-format-list-item
-                         contents type nil info nil
-                         (concat (org-html--anchor preferred-id nil nil info)
-                                 extra-ids
-                                 full-text))))
-                  (concat (and (org-export-first-sibling-p headline info)
-                               (org-html-begin-plain-list type))
-                          itemized-body
-                          (and (org-export-last-sibling-p headline info)
-                               (org-html-end-plain-list type))))
-              (let ((extra-class (org-element-property :HTML_CONTAINER_CLASS headline))
-                    (first-content (car (org-element-contents headline))))
-                ;; Standard headline.  Export it as a section.
-                (format "<%s id=\"%s\" class=\"%s\">%s%s</%s>\n"
-                        (org-html--container headline info)
-                        (org-export-get-reference headline info)
-                        (concat (format "outline-%d" level)
-                                (and extra-class " ")
-                                extra-class)
-                        (format "\n<h%d id=\"%s\">%s%s</h%d>\n"
-                                level
-                                preferred-id
-                                extra-ids
-                                (concat
-                                 (and numberedp
-                                      (format
-                                       "<span class=\"section-number-%d\">%s</span> "
-                                       level
-                                       (mapconcat #'number-to-string numbers ".")))
-                                 full-text)
-                                level)))))))
-
       )))
-
-(defun dinghmcn-org/post-init-ox-reveal ()
-  (setq org-reveal-root "file:///Users/guanghui/.emacs.d/reveal-js"))
-
 
 (defun dinghmcn-org/init-org-tree-slide ()
   (use-package org-tree-slide
@@ -427,7 +299,7 @@ unwanted space when exporting org-mode to html."
 (defun dinghmcn-org/init-plain-org-wiki ()
   (use-package plain-org-wiki
     :init
-    (setq pow-directory "~/org-notes")))
+    (setq pow-directory (expand-file-name "inbox.org" org-agenda-dir))))
 
 (defun dinghmcn-org/init-worf ()
   (use-package worf
