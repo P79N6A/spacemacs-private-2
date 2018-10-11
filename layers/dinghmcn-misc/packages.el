@@ -11,12 +11,10 @@
 
 (setq dinghmcn-misc-packages
       '(
+        (helm :location built-in)
         helm-github-stars
-        helm
-        helm-ag
+        ;;helm-ag
         projectile
-        prodigy
-        find-file-in-project
         multiple-cursors
         visual-regexp
         visual-regexp-steroids
@@ -33,7 +31,6 @@
         flyspell-correct
         peep-dired
         markdown-mode
-        swiper
         magit
         git-messenger
         gist
@@ -514,7 +511,7 @@ Search for a search tool in the order provided by `dotspacemacs-search-tools'."
   (progn
     (with-eval-after-load 'flyspell
       (define-key flyspell-mode-map (kbd "C-;") 'flyspell-correct-previous-word-generic))
-    (setq flyspell-correct-interface 'flyspell-correct-ivy)))
+    (setq flyspell-correct-interface 'flyspell-correct-helm)))
 
 (defun dinghmcn-misc/post-init-smartparens ()
   (use-package smartparens
@@ -718,7 +715,6 @@ Search for a search tool in the order provided by `dotspacemacs-search-tools'."
 
     (define-key evil-normal-state-map (kbd "[ b") 'previous-buffer)
     (define-key evil-normal-state-map (kbd "] b") 'next-buffer)
-    (define-key evil-normal-state-map (kbd "M-y") 'counsel-yank-pop)
 
     ;; (define-key evil-insert-state-map "\C-e" 'end-of-line)
     ;; (define-key evil-insert-state-map "\C-n" 'next-line)
@@ -826,10 +822,6 @@ Search for a search tool in the order provided by `dotspacemacs-search-tools'."
       (define-key endless/mc-map "\C-e" #'mc/edit-ends-of-lines)
       )
     :config
-    (setq mc/cmds-to-run-once
-          '(
-            counsel-M-x
-            dinghmcn/my-mc-mark-next-like-this))
     (setq mc/cmds-to-run-for-all
           '(
             electric-newline-and-maybe-indent
@@ -897,45 +889,11 @@ Search for a search tool in the order provided by `dotspacemacs-search-tools'."
 (defun dinghmcn-misc/post-init-evil-escape ()
   (setq evil-escape-delay 0.2))
 
-(defun dinghmcn-misc/init-find-file-in-project ()
-  (use-package find-file-in-project
-    :defer t
-    :config
-    (progn
-      ;; If you use other VCS (subversion, for example), enable the following option
-      ;;(setq ffip-project-file ".svn")
-      ;; in MacOS X, the search file command is CMD+p
-      ;; for this project, I'm only interested certain types of files
-      (setq-default ffip-patterns '("*.html" "*.js" "*.css" "*.java" "*.xml" "*.cpp" "*.h" "*.c" "*.mm" "*.m" "*.el"))
-      ;; if the full path of current file is under SUBPROJECT1 or SUBPROJECT2
-      ;; OR if I'm reading my personal issue track document,
-      (defadvice find-file-in-project (before my-find-file-in-project activate compile)
-        (when (ffip-current-full-filename-match-pattern-p "\\(/fireball\\)")
-          ;; set the root directory into "~/projs/PROJECT_DIR"
-          (setq-local ffip-project-root "~/Github/fireball")
-          ;; well, I'm not interested in concatenated BIG js file or file in dist/
-          (setq-local ffip-find-options "-not -size +64k -not -iwholename '*/bin/*'")
-          ;; do NOT search files in below directories, the default value is better.
-          (dolist (item '("*/docs/html/*" "*.meta" "*/cocos2d-x/*" "*.asset" "*/visual-tests/res/*"))
-            (push item  ffip-prune-patterns)))
-        (when (ffip-current-full-filename-match-pattern-p "\\(/cocos2d-x\\)")
-          ;; set the root directory into "~/projs/PROJECT_DIR"
-          (setq-local ffip-project-root "~/cocos2d-x")
-          ;; well, I'm not interested in concatenated BIG js file or file in dist/
-          (setq-local ffip-find-options "-not -size +64k -not -iwholename '*/bin/*'")
-          ;; do NOT search files in below directories, the default value is better.
-          ;; (setq-default ffip-prune-patterns '(".git" ".hg" "*.svn" "node_modules" "bower_components" "obj"))
-          ))
-      (ad-activate 'find-file-in-project))))
-
-
-
-
 (defun dinghmcn-misc/post-init-projectile ()
   (progn
     (with-eval-after-load 'projectile
       (progn
-        (setq projectile-completion-system 'ivy)))
+        (setq projectile-completion-system 'helm)))
 
     (defvar my-simple-todo-regex "\\<\\(FIXME\\|TODO\\|BUG\\):")
 
@@ -947,80 +905,7 @@ Search for a search tool in the order provided by `dotspacemacs-search-tools'."
       (if (projectile-project-p)
           (multi-occur (projectile-project-buffers) my-simple-todo-regex)
         (occur my-simple-todo-regex)))
-    (spacemacs/set-leader-keys "pf" 'dinghmcn/open-file-with-projectile-or-counsel-git)
     (spacemacs/set-leader-keys "pt" 'my-simple-todo)))
-
-
-
-(defun dinghmcn-misc/post-init-prodigy ()
-  (progn
-    (prodigy-define-tag
-      :name 'jekyll
-      :env '(("LANG" "en_US.UTF-8")
-             ("LC_ALL" "en_US.UTF-8")))
-    ;; define service
-    (prodigy-define-service
-      :name "Preview cocos2d-x web"
-      :command "python"
-      :args '("-m" "SimpleHTTPServer" "6001")
-      :cwd "~/cocos2d-x/web"
-      :tags '(work)
-      :kill-signal 'sigkill
-      :kill-process-buffer-on-stop t)
-
-    (prodigy-define-service
-      :name "Preview creator engine"
-      :command "python"
-      :args '("-m" "SimpleHTTPServer" "6004")
-      :cwd "~/Github/fireball/engine"
-      :tags '(work)
-      :kill-signal 'sigkill
-      :kill-process-buffer-on-stop t)
-
-    (prodigy-define-service
-      :name "Hexo Server"
-      :command "hexo"
-      :args '("server")
-      :cwd blog-admin-dir
-      :tags '(hexo server)
-      :kill-signal 'sigkill
-      :kill-process-buffer-on-stop t)
-
-    (prodigy-define-service
-      :name "Hexo Deploy"
-      :command "hexo"
-      :args '("deploy" "--generate")
-      :cwd blog-admin-dir
-      :tags '(hexo deploy)
-      :kill-signal 'sigkill
-      :kill-process-buffer-on-stop t)
-
-    (prodigy-define-service
-      :name "Debug Fireball"
-      :command "npm"
-      :args '("start" "--" "--nologin" "/Users/guanghui/Github/example-cases")
-      :cwd "~/Github/fireball/"
-      :tags '(work)
-      :kill-signal 'sigkill
-      :kill-process-buffer-on-stop t)
-
-    (prodigy-define-service
-      :name "Org wiki preview"
-      :command "python"
-      :args '("-m" "SimpleHTTPServer" "8088")
-      :cwd "~/org-notes/public_html"
-      :tags '(org-mode)
-      :init (lambda () (browse-url "http://localhost:8088"))
-      :kill-signal 'sigkill
-      :kill-process-buffer-on-stop t)
-
-    (defun refresh-chrome-current-tab (beg end length-before)
-      (call-interactively 'dinghmcn/browser-refresh--chrome-applescript))
-    ;; add watch for prodigy-view-mode buffer change event
-    (add-hook 'prodigy-view-mode-hook
-              #'(lambda() (set (make-local-variable 'after-change-functions) #'refresh-chrome-current-tab)))
-
-    ))
 
 (defun dinghmcn-misc/init-moz-controller ()
   (use-package moz-controller
@@ -1065,53 +950,6 @@ Search for a search tool in the order provided by `dotspacemacs-search-tools'."
     (progn
       (keyfreq-mode t)
       (keyfreq-autosave-mode 1))))
-
-(defun dinghmcn-misc/post-init-swiper ()
-  "Initialize my package"
-  (progn
-    (setq ivy-use-virtual-buffers t)
-    (setq ivy-display-style 'fancy)
-
-
-    (evilified-state-evilify ivy-occur-mode ivy-occur-mode-map)
-
-    (use-package ivy
-      :defer t
-      :config
-      (progn
-        (spacemacs|hide-lighter ivy-mode)
-
-        (ivy-set-actions
-         t
-         '(("f" my-find-file-in-git-repo "find files")
-           ("!" my-open-file-in-external-app "Open file in external app")
-           ("I" ivy-insert-action "insert")
-           ("C" ivy-kill-new-action "copy")
-           ("S" ivy-ff-checksum-action "Checksum")))
-
-        (spacemacs/set-leader-keys "fad" 'counsel-goto-recent-directory)
-        (spacemacs/set-leader-keys "faf" 'counsel-find-file-recent-directory)
-
-        (setq ivy-initial-inputs-alist nil)
-        (setq ivy-wrap t)
-        (setq confirm-nonexistent-file-or-buffer t)
-
-        ;; (when (not (configuration-layer/layer-usedp 'helm))
-        ;;   (spacemacs/set-leader-keys "sp" 'counsel-git-grep)
-        ;;   (spacemacs/set-leader-keys "sP" 'spacemacs/counsel-git-grep-region-or-symbol))
-        (define-key ivy-minibuffer-map (kbd "C-c o") 'ivy-occur)
-        (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-call)
-        (define-key ivy-minibuffer-map (kbd "C-s-m") 'ivy-partial-or-done)
-        (define-key ivy-minibuffer-map (kbd "C-c s") 'ivy-ff-checksum)
-        (define-key ivy-minibuffer-map (kbd "s-o") 'ivy-dispatching-done-hydra)
-        (define-key ivy-minibuffer-map (kbd "C-c C-e") 'spacemacs//counsel-edit)
-        (define-key ivy-minibuffer-map (kbd "<f3>") 'ivy-occur)
-        (define-key ivy-minibuffer-map (kbd "C-s-j") 'ivy-immediate-done)
-        (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
-        (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)))
-
-    (define-key global-map (kbd "C-s") 'my-swiper-search)))
-
 
 (defun dinghmcn-misc/post-init-magit ()
   (progn

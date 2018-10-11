@@ -109,8 +109,6 @@
         "n" 'peep-dired-next-file
         "z" 'dired-get-size
         "c" 'dired-copy-file-here
-        "J" 'counsel-find-file
-        "f" 'dinghmcn/open-file-with-projectile-or-counsel-git
         ")" 'dired-omit-mode)
       )))
 

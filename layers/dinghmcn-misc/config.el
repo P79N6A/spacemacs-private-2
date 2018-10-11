@@ -22,7 +22,7 @@
                                             ("8zh" "@~chinese")
                                             ("8sp" "spacemacs")
                                             ;; email
-                                            ("8me" "guanghui8827@gmail.com")
+                                            ("8me" "dinghmcn@gmail.com")
 
                                             ;; computing tech
                                             ("8wp" "Wikipedia")
@@ -42,4 +42,4 @@
                                             ("8str" "\\([^\"]+?\\)\"")))
 
 
-(setq user-mail-address "guanghui8827@gmail.com")
+(setq user-mail-address "dinghmcn@gmail.com")

@@ -37,11 +37,11 @@
             )
       (add-hook 'blog-admin-backend-after-new-post-hook 'find-file)
       )))
-      
+
 (defun dinghmcn-org/init-hexo ()
     (progn
       ;; do your configuration here
-      (setq 
+      (setq
         hexo-posix-compatible-shell-file-path "/bin/zsh"
         )))
 
@@ -65,6 +65,7 @@
         "," 'org-priority)
       (require 'org-compat)
       (require 'org)
+      (require 'org-protocol)
       ;; (add-to-list 'org-modules "org-habit")
       (add-to-list 'org-modules 'org-habit)
       (require 'org-habit)
@@ -215,12 +216,12 @@
          ))
 
       ;; define the refile targets
+      (setq org-default-notes-file (expand-file-name "inbox.org" org-agenda-dir))
       (setq org-agenda-file-inbox (expand-file-name "inbox.org" org-agenda-dir))
       (setq org-agenda-file-task (expand-file-name "task.org" org-agenda-dir))
-      (setq org-agenda-file-diary (expand-file-name "diary.org" org-agenda-dir))
+      (setq org-agenda-file-journal (expand-file-name "journal.org" org-agenda-dir))
       (setq org-agenda-file-code-snippet (expand-file-name "snippet.org" org-agenda-dir))
       (setq org-agenda-file-project (expand-file-name "project.org" org-agenda-dir))
-      (setq org-default-notes-file (expand-file-name "inbox.org" org-agenda-dir))
       (setq org-agenda-files (list org-agenda-dir))
 
       (with-eval-after-load 'org-agenda
@@ -232,31 +233,37 @@
       ;;http://www.howardism.org/Technical/Emacs/journaling-org.html
       ;;add multi-file journal
       (setq org-capture-templates
-            '(("t" "Todo" entry (file+headline org-agenda-file-task "Tasks")
-               "* TODO [#B] %?\n  %i\n"
-               :empty-lines 1)
+            '(("i" "Ideas" entry (file+headline org-agenda-file-task "Ideas")
+               "* TODO [#B] %?\n  %i\n %U" :empty-lines 1)
+
+              ("j" "Journal" entry (file+olp+datetree org-agenda-file-journal "Journals")
+               "* %? [%<%02H:%02M:%02S>]" :tree-type week :empty-lines 0)
+
+              ("L" "links" entry (file+headline org-agenda-file-inbox "Quick notes")
+               "* TODO [#C] %?\n  %i\n %a \n %U" :empty-lines 1)
+
               ("n" "notes" entry (file+headline org-agenda-file-inbox "Quick notes")
-               "* %?\n  %i\n %U"
-               :empty-lines 1)
-              ("i" "Ideas" entry (file+headline org-agenda-file-task "Ideas")
-               "* TODO [#B] %?\n  %i\n %U"
-               :empty-lines 1)
-              ("s" "Code Snippet" entry
-               (file org-agenda-file-code-snippet)
+               "* %?\n  %i\n %U" :empty-lines 1)
+
+              ;;("p" "Protocol")
+              ("p" "Protocol Note" entry (file+headline org-agenda-file-inbox "Quick notes")
+               "* %^{Title}\nSource: %u, %c\n#+BEGIN_QUOTE\n%i\n\t#+END_QUOTE\n\n%?")
+              ("l" "Protocol Bookmark" entry (file+headline org-agenda-file-inbox "Bookmarks")
+               "* %? [[%:link][%:description]] \nCaptured On: %U")
+
+              ("s" "Code Snippet" entry (file org-agenda-file-code-snippet)
                "* %?\t%^g\n#+BEGIN_SRC %^{language}\n\n#+END_SRC")
+
+               ("t" "Todo" entry (file+headline org-agenda-file-task "Tasks")
+               "* TODO [#B] %?\n  %i\n" :empty-lines 1)
+
               ("w" "work" entry (file+headline org-agenda-file-project "Workspace")
-               "* TODO [#A] %?\n  %i\n %U"
-               :empty-lines 1)
+               "* TODO [#A] %?\n  %i\n %U" :empty-lines 1)
+
               ;;("c" "Chrome" entry (file+headline org-agenda-file-inbox "Quick notes")
               ;; "* TODO [#C] %?\n %(dinghmcn/retrieve-chrome-current-tab-url)\n %i\n %U"
               ;; :empty-lines 1)
-              ("l" "links" entry (file+headline org-agenda-file-inbox "Quick notes")
-               "* TODO [#C] %?\n  %i\n %a \n %U"
-               :empty-lines 1)
-              ("d" "Diary Entry"
-               entry (file+datetree org-agenda-file-diary)
-               "* %? [%<%02H:%02M:%02S>]"
-               :empty-lines 0)))
+              ))
 
       ;;An entry without a cookie is treated just like priority ' B '.
       ;;So when create new task, they are default 重要且紧急

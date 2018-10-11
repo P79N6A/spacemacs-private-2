@@ -1,6 +1,6 @@
 ;;; funcs.el --- dinghmcn Layer packages File for Spacemacs
 ;;
-;; Copyright (c) 2015-2016 dinghmcn 
+;; Copyright (c) 2015-2016 dinghmcn
 ;;
 ;; Author: dinghmcn <guanghui8827@gmail.com>
 ;; URL: https://github.com/dinghmcn/spacemacs-private
@@ -57,25 +57,6 @@
 (defun dinghmcn/save-my-layout ()
   (interactive)
   (persp-save-state-to-file (concat persp-save-dir "dinghm")))
-
-;; http://blog.binchen.org/posts/use-ivy-mode-to-search-bash-history.html
-;; ;FIXME: make it work with zsh
-(defun counsel-yank-bash-history ()
-  "Yank the bash history"
-  (interactive)
-  (let (hist-cmd collection val)
-    (shell-command "history -r") ; reload history
-    (setq collection
-          (nreverse
-           (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.bash_history"))
-                                           (buffer-string))
-                         "\n"
-                         t)))
-    (when (and collection (> (length collection) 0)
-               (setq val (if (= 1 (length collection)) (car collection)
-                           (ivy-read (format "Bash history:") collection))))
-      (kill-new val)
-      (message "%s => kill-ring" val))))
 
   ;; my fix for tab indent
 (defun dinghmcn/indent-region(numSpaces)
@@ -136,30 +117,6 @@
   (if (not (eq last-command-event 13))
       (git-timemachine-quit)))
 
-;; http://blog.binchen.org/posts/new-git-timemachine-ui-based-on-ivy-mode.html
-(defun my-git-timemachine-show-selected-revision ()
-  "Show last (current) revision of file."
-  (interactive)
-  (let (collection)
-    (setq collection
-          (mapcar (lambda (rev)
-                    ;; re-shape list for the ivy-read
-                    (cons (concat (substring (nth 0 rev) 0 7) "|" (nth 5 rev) "|" (nth 6 rev)) rev))
-                  (git-timemachine--revisions)))
-    (ivy-read "commits:"
-              collection
-              :unwind #'my-unwind-git-timemachine
-              :action (lambda (rev)
-                        (git-timemachine-show-revision (cdr rev))))))
-
-(defun my-git-timemachine ()
-  "Open git snapshot with the selected version.  Based on ivy-mode."
-  (interactive)
-  (unless (featurep 'git-timemachine)
-    (require 'git-timemachine))
-  (git-timemachine--start #'my-git-timemachine-show-selected-revision))
-
-
 (defun dinghmcn/helm-hotspots ()
   "helm interface to my hotspots, which includes my locations,
 org-files and bookmarks"
@@ -172,7 +129,7 @@ org-files and bookmarks"
   `((name . "Mail and News")
     (candidates . (("Calendar" . (lambda ()  (browse-url "https://www.google.com/calendar/render")))
                    ("RSS" . elfeed)
-                   ("Hexo" . (lambda() (hexo "~/Documents/Blog/")))
+                   ("Hexo" . (lambda() (hexo blog-dir)))
                    ("Blog" . blog-admin-start)
                    ("Github" . (lambda() (helm-github-stars)))
                    ("Calculator" . (lambda() (helm-calcul-expression)))
@@ -221,15 +178,6 @@ e.g. Sunday, September 17, 2000."
 (define-global-minor-mode
   global-shadowsocks-proxy-mode shadowsocks-proxy-mode shadowsocks-proxy-mode
   :group 'shadowsocks-proxy)
-
-
-(defun dinghmcn/open-file-with-projectile-or-counsel-git ()
-  (interactive)
-  (if (dinghmcn/git-project-root)
-      (counsel-git)
-    (if (projectile-project-p)
-        (projectile-find-file)
-      (counsel-file-jump))))
 
 
 ;; http://blog.lojic.com/2009/08/06/send-growl-notifications-from-carbon-emacs-on-osx/
@@ -470,37 +418,6 @@ With PREFIX, cd to project root."
      t
      )))
 
-(defun my-swiper-search (p)
-  (interactive "P")
-  (let ((current-prefix-arg nil))
-    (call-interactively
-     (if p #'spacemacs/swiper-region-or-symbol
-       #'counsel-grep-or-swiper))))
-
-(defun ivy-ff-checksum ()
-  (interactive)
-  "Calculate the checksum of FILE. The checksum is copied to kill-ring."
-  (let ((file (expand-file-name (ivy-state-current ivy-last) ivy--directory))
-        (algo (intern (ivy-read
-                       "Algorithm: "
-                       '(md5 sha1 sha224 sha256 sha384 sha512)))))
-    (kill-new (with-temp-buffer
-                (insert-file-contents-literally file)
-                (secure-hash algo (current-buffer))))
-    (message "Checksum copied to kill-ring.")))
-
-(defun ivy-ff-checksum-action (x)
-  (ivy-ff-checksum))
-
-(defun my-find-file-in-git-repo (repo)
-  (if (file-directory-p repo)
-      (let* ((default-directory repo)
-             (files (split-string (shell-command-to-string (format "cd %s && git ls-files" repo)) "\n" t)))
-        (ivy-read "files:" files
-                  :action 'find-file
-                  :caller 'my-find-file-in-git-repo))
-    (message "%s is not a valid directory." repo)))
-
 (defun my-open-file-in-external-app (file)
   "Open file in external application."
   (interactive)
@@ -513,42 +430,6 @@ With PREFIX, cd to project root."
          ((spacemacs/system-is-linux) (let ((process-connection-type nil))
                                         (start-process "" nil "xdg-open" file-path))))
       (message "No file associated to this buffer."))))
-
-(defun ivy-insert-action (x)
-  (with-ivy-window
-    (insert x)))
-
-(defun ivy-kill-new-action (x)
-  (with-ivy-window
-    (kill-new x)))
-
-(defun counsel-goto-recent-directory ()
-  "Recent directories"
-  (interactive)
-  (unless recentf-mode (recentf-mode 1))
-  (let ((collection
-         (delete-dups
-          (append (mapcar 'file-name-directory recentf-list)
-                  ;; fasd history
-                  (if (executable-find "fasd")
-                      (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
-    (ivy-read "directories:" collection
-              :action 'dired
-              :caller 'counsel-goto-recent-directory)))
-
-(defun counsel-find-file-recent-directory ()
-  "Find file in recent git repository."
-  (interactive)
-  (unless recentf-mode (recentf-mode 1))
-  (let ((collection
-         (delete-dups
-          (append (mapcar 'file-name-directory recentf-list)
-                  ;; fasd history
-                  (if (executable-find "fasd")
-                      (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
-    (ivy-read "directories:" collection
-              :action 'my-find-file-in-git-repo
-              :caller 'counsel-find-file-recent-directory)))
 
 (defun dinghmcn/magit-visit-pull-request ()
   "Visit the current branch's PR on GitHub."
@@ -602,7 +483,3 @@ Error out if this isn't a GitHub repo."
   (interactive)
   (describe-variable 'major-mode))
 
-(defun dinghmcn/counsel-imenu ()
-  (interactive)
-  (counsel-imenu)
-  (evil-set-jump))
