@@ -39,11 +39,11 @@
       )))
 
 (defun dinghmcn-org/init-hexo ()
-    (progn
-      ;; do your configuration here
-      (setq
-        hexo-posix-compatible-shell-file-path "/bin/zsh"
-        )))
+  (progn
+    ;; do your configuration here
+    (setq
+     hexo-posix-compatible-shell-file-path "/bin/zsh"
+     )))
 
 (defun dinghmcn-org/post-init-org-pomodoro ()
   (progn
@@ -237,7 +237,7 @@
                "* TODO [#B] %?\n  %i\n %U" :empty-lines 1)
 
               ("j" "Journal" entry (file+olp+datetree org-agenda-file-journal "Journals")
-               "* %? [%<%02H:%02M:%02S>]" :tree-type week :empty-lines 0)
+               "* %?°C [%<%02H:%02M:%02S>] %^g\n"  :tree-type week :empty-lines 0)
 
               ("L" "links" entry (file+headline org-agenda-file-inbox "Quick notes")
                "* TODO [#C] %?\n  %i\n %a \n %U" :empty-lines 1)
@@ -254,7 +254,7 @@
               ("s" "Code Snippet" entry (file org-agenda-file-code-snippet)
                "* %?\t%^g\n#+BEGIN_SRC %^{language}\n\n#+END_SRC")
 
-               ("t" "Todo" entry (file+headline org-agenda-file-task "Tasks")
+              ("t" "Todo" entry (file+headline org-agenda-file-task "Tasks")
                "* TODO [#B] %?\n  %i\n" :empty-lines 1)
 
               ("w" "work" entry (file+headline org-agenda-file-project "Workspace")
