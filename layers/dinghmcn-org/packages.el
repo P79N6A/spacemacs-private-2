@@ -201,7 +201,6 @@
       (org-babel-do-load-languages
        'org-babel-load-languages
        '(
-         (shell . t)
          (C . t)
          (ditaa . t)
          (dot . t)
@@ -213,6 +212,7 @@
          (perl . t)
          (plantuml . t)
          (python . t)
+         (shell . t)
          ))
 
       ;; define the refile targets

@@ -47,8 +47,8 @@ This function should only modify configuration layer settings."
                       auto-completion-idle-delay 0.2
                       auto-completion-private-snippets-directory nil
                       auto-completion-enable-snippets-in-popup t
-                      auto-completion-enable-help-tooltip nil
-                      auto-completion-enable-sort-by-usage nil
+                      auto-completion-enable-help-tooltip t
+                      auto-completion-enable-sort-by-usage t
                       auto-completion-private-snippets-directory "~/.spacemacs.d/snippets"
                       :disabled-for markdown)
      ;;autohotkey
@@ -64,6 +64,8 @@ This function should only modify configuration layer settings."
      (colors :variables
              colors-enable-nyan-cat-progress-bar t
              colors-colorize-identifiers 'all)
+     (dash :variables
+           helm-dash-docset-newpath "~/.docsets")
      deft
      ;; docker
      emacs-lisp
@@ -229,8 +231,7 @@ It should only modify the values of Spacemacs settings."
    ;; `recents' `bookmarks' `projects' `agenda' `todos'.
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
-   dotspacemacs-startup-lists '((todos . 3)
-                                (agenda . 5)
+   dotspacemacs-startup-lists '((recents . 7)
                                 (bookmarks . 5)
                                 (projects . 3))
 
@@ -415,15 +416,7 @@ It should only modify the values of Spacemacs settings."
    ;;                       text-mode
    ;;   :size-limit-kb 1000)
    ;; (default nil)
-   dotspacemacs-line-numbers
-   '(:relative nil
-               :disabled-for-modes dired-mode
-               doc-view-mode
-               markdown-mode
-               org-mode
-               pdf-view-mode
-               text-mode
-               :size-limit-kb 1000)
+   dotspacemacs-line-numbers 'relative
 
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
@@ -525,25 +518,36 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;;设置宽和高,我的十寸小本是110,33,大家可以调整这个参数来适应自己屏幕大小
   ;;(setq default-frame-alist '((height . 40) (width . 128) (menu-bar-lines . 0)))
   (if window-system
-      (progn
-        (set-frame-position (selected-frame)
-                            (round (* (x-display-pixel-width) 0.191))
-                            (round (* (x-display-pixel-height) 0.05)))
-        (add-to-list 'default-frame-alist
-                     (cons 'width (round (* (/ (x-display-pixel-width) (frame-char-width)) 0.618))))
-        (add-to-list 'default-frame-alist
-                     (cons 'height (round (* (/ (x-display-pixel-height) (frame-char-height)) 0.75) )))))
-
-  (if 't
-      (setq configuration-layer-elpa-archives
-            '(("melpa" . "melpa.org/packages/")
-              ("org" . "orgmode.org/elpa/")
-              ("gnu" . "elpa.gnu.org/packages/")))
-    (setq configuration-layer-elpa-archives
-          '(("melpa-cn" . "http://elpa.emacs-china.org/melpa/")
-            ("org-cn"   . "http://elpa.emacs-china.org/org/")
-            ("gnu-cn"   . "http://elpa.emacs-china.org/gnu/")))
+      (cond
+       ((spacemacs/system-is-mswindows)
+        (progn
+          (set-frame-position (selected-frame)
+                              (round (* (x-display-pixel-width) 0.158))
+                              (round (* (x-display-pixel-height) 0.08)))
+          (add-to-list 'default-frame-alist
+                       (cons 'width (round (* (/ (x-display-pixel-width) (frame-char-width)) 0.65))))
+          (add-to-list 'default-frame-alist
+                       (cons 'height (round (* (/ (x-display-pixel-height) (frame-char-height)) 0.75) )))))
+       ((spacemacs/system-is-linux)
+        (progn
+          (set-frame-position (selected-frame)
+                              (round (* (x-display-pixel-width) 0.158))
+                              (round (* (x-display-pixel-height) 0.08)))
+          (add-to-list 'default-frame-alist
+                       (cons 'width (round (* (/ (x-display-pixel-width) (frame-char-width)) 0.5))))
+          (add-to-list 'default-frame-alist
+                       (cons 'height (round (* (/ (x-display-pixel-height) (frame-char-height)) 0.6) ))))))
     )
+  (if 't
+      (if 'nil
+          (setq configuration-layer-elpa-archives
+                '(("melpa" . "melpa.org/packages/")
+                  ("org" . "orgmode.org/elpa/")
+                  ("gnu" . "elpa.gnu.org/packages/")))
+        (setq configuration-layer-elpa-archives
+              '(("melpa-cn" . "http://elpa.emacs-china.org/melpa/")
+                ("org-cn"   . "http://elpa.emacs-china.org/org/")
+                ("gnu-cn"   . "http://elpa.emacs-china.org/gnu/")))))
 
   ;; https://github.com/syl20bnr/spacemacs/issues/2705
   ;; (setq tramp-mode nil)
@@ -580,6 +584,9 @@ before packages are loaded."
 
   ;; force horizontal split window
   (setq split-width-threshold 120)
+
+  ;; use eww to browse your docsets
+  (setq helm-dash-browser-func 'eww)
 
   ;; enable company-mode
   (global-company-mode)
@@ -670,23 +677,3 @@ before packages are loaded."
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-  (custom-set-variables
-   ;; custom-set-variables was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(package-selected-packages
-     (quote
-      (helm-org-rifle youdao-dictionary yasnippet-snippets yapfify yaml-mode xterm-color ws-butler wrap-region winum which-key web-mode web-beautify volatile-highlights visual-regexp-steroids vi-tilde-fringe uuidgen use-package unfill toc-org tiny tagedit symon string-inflection spaceline-all-the-icons smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs ranger rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyim pyenv-mode py-isort pug-mode prettier-js popwin plantuml-mode pippel pipenv pip-requirements persp-mode peep-dired pcre2el password-generator paradox pangu-spacing ox-gfm overseer orgit org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file neotree nameless mwim mvn multiple-cursors multi-term move-text mmm-mode meghanada maven-test-mode markdown-toc magithub magit-svn magit-gitflow magit-gh-pulls macrostep lorem-ipsum live-py-mode link-hint indent-guide importmagic impatient-mode ibuffer-projectile hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation highlight-global hexo helm-xref helm-themes helm-swoop helm-rtags helm-pydoc helm-purpose helm-projectile helm-mode-manager helm-make helm-gitignore helm-github-stars helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag groovy-mode groovy-imports graphviz-dot-mode gradle-mode google-translate google-c-style golden-ratio gnuplot gitignore-templates github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-rtags flycheck-pos-tip flx-ido find-by-pinyin-dired fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline discover-my-major disaster diminish diff-hl deft define-word cython-mode company-web company-statistics company-rtags company-emacs-eclim company-c-headers company-auctex company-anaconda column-enforce-mode color-identifiers-mode clojure-snippets clojure-cheatsheet clean-aindent-mode clang-format cider-eval-sexp-fu chinese-conv centered-cursor-mode browse-at-remote blog-admin auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-window ace-pinyin ace-link ace-jump-helm-line ac-ispell 4clojure))))
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   )
-  )
