@@ -1,4 +1,4 @@
-; -*- lexical-binding: t -*-
+                                        ; -*- lexical-binding: t -*-
 ;;; packages.el --- dinghmcn Layer packages File for Spacemacs
 ;;
 ;; Copyright (c) 2014-2016 dinghmcn
@@ -16,7 +16,7 @@
     (profiler :location built-in)
     (recentf :location built-in)
     )
-)
+  )
 
 (defun dinghmcn-better-defaults/post-init-recentf ()
   (progn
@@ -38,7 +38,9 @@
             "\\.sub$"
             "\\.srt$"
             "\\.ass$"
-            ".*png$"))
+            ".*png$"
+            "/.emacs.d/.cache/"
+            "/Documents/OneDrive/Documents/GTD/"))
     (setq recentf-max-saved-items 2048)))
 
 (defun dinghmcn-better-defaults/init-dired-mode ()

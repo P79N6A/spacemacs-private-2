@@ -107,7 +107,7 @@
       ;; (add-to-list 'auto-mode-alist '("\.org\\'" . org-mode))
 
       (setq org-todo-keywords
-            '((sequence "TODO(t)" "STARTED(s)" "WAITING(w@/!)" "SOMEDAY(S)" "|" "DONE(d!/!)" "ABORT(a@/!)")))
+            '((sequence "TODO(t)" "STARTED(s!)" "WAITING(w@/!)" "SOMEDAY(S)" "|" "DONE(d!/!)" "ABORT(a@/!)")))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       ;; Org clock
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -236,7 +236,7 @@
             '(("i" "Ideas" entry (file+headline org-agenda-file-task "Ideas")
                "* TODO [#B] %?\n  %i\n %U" :empty-lines 1)
 
-              ("j" "Journal" entry (file+olp+datetree org-agenda-file-journal "Journals")
+              ("j" "Journal" entry (file+olp+datetree org-agenda-file-journal)
                "* %?°C [%<%02H:%02M:%02S>] %^g\n"  :tree-type week :empty-lines 0)
 
               ("L" "links" entry (file+headline org-agenda-file-inbox "Quick notes")

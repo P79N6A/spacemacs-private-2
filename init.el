@@ -130,7 +130,11 @@ This function should only modify configuration layer settings."
    dotspacemacs-frozen-packages '()
 
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '(counsel-projectile)
+   dotspacemacs-excluded-packages '(
+                                    ;;counsel-projectile
+                                    clojure-cheatsheet
+                                    forge
+                                    )
 
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
@@ -231,7 +235,8 @@ It should only modify the values of Spacemacs settings."
    ;; `recents' `bookmarks' `projects' `agenda' `todos'.
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
-   dotspacemacs-startup-lists '((recents . 7)
+   dotspacemacs-startup-lists '((agenda . 3)
+                                (recents . 7)
                                 (bookmarks . 5)
                                 (projects . 3))
 
@@ -271,12 +276,14 @@ It should only modify the values of Spacemacs settings."
                                '("Source Code Variable"
                                  :size 13
                                  :weight normal
-                                 :width normal))
+                                 :width normal
+                                 :powerline-scale 1.1))
                               ((spacemacs/system-is-linux)
                                '("Source Code Pro"
                                  :size 13
                                  :weight normal
-                                 :width normal)))
+                                 :width normal
+                                 :powerline-scale 1.1)))
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -416,7 +423,14 @@ It should only modify the values of Spacemacs settings."
    ;;                       text-mode
    ;;   :size-limit-kb 1000)
    ;; (default nil)
-   dotspacemacs-line-numbers 'relative
+   dotspacemacs-line-numbers '(:relative nil
+                                         :disabled-for-modes dired-mode
+                                         doc-view-mode
+                                         markdown-mode
+                                         org-mode
+                                         pdf-view-mode
+                                         text-mode
+                                         :size-limit-kb 1000)
 
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
@@ -484,7 +498,7 @@ It should only modify the values of Spacemacs settings."
    ;; `trailing' to delete only the whitespace at end of lines, `changed' to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup 'trailing
+   dotspacemacs-whitespace-cleanup nil
 
    ;; Either nil or a number of seconds. If non-nil zone out after the specified
    ;; number of seconds. (default nil)
@@ -538,24 +552,27 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
           (add-to-list 'default-frame-alist
                        (cons 'height (round (* (/ (x-display-pixel-height) (frame-char-height)) 0.6) ))))))
     )
-  (if 't
-      (if 'nil
-          (setq configuration-layer-elpa-archives
-                '(("melpa" . "melpa.org/packages/")
-                  ("org" . "orgmode.org/elpa/")
-                  ("gnu" . "elpa.gnu.org/packages/")))
-        (setq configuration-layer-elpa-archives
-              '(("melpa-cn" . "http://elpa.emacs-china.org/melpa/")
-                ("org-cn"   . "http://elpa.emacs-china.org/org/")
-                ("gnu-cn"   . "http://elpa.emacs-china.org/gnu/")))))
+  (let ((num 3))
+    (cond
+     ((eq num 1) (setq configuration-layer-elpa-archives
+                       '(("melpa" . "melpa.org/packages/")
+                         ("org" . "orgmode.org/elpa/")
+                         ("gnu" . "elpa.gnu.org/packages/"))))
+     ((eq num 2) (setq configuration-layer-elpa-archives
+                       '(("melpa-cn" . "elpa.emacs-china.org/melpa/")
+                         ("org-cn"   . "elpa.emacs-china.org/org/")
+                         ("gnu-cn"   . "elpa.emacs-china.org/gnu/"))))
+     ((eq num 3) (setq configuration-layer-elpa-archives
+                       '(("melpa-tuna" . "mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+                         ("org-tuna"   . "mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+                         ("gnu-tuna"   . "mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"))))
+     ))
 
   ;; https://github.com/syl20bnr/spacemacs/issues/2705
   ;; (setq tramp-mode nil)
   (setq tramp-ssh-controlmaster-options
         "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no")
 
-  ;; ss proxy. But it will cause anacond-mode failed.
-  (setq socks-server '("Default server" "127.0.0.1" 1080 5))
   (setq evil-shift-round nil)
   (setq byte-compile-warnings '(not obsolete))
   (setq warning-minimum-level :error)
@@ -587,6 +604,9 @@ before packages are loaded."
 
   ;; use eww to browse your docsets
   (setq helm-dash-browser-func 'eww)
+
+  ;; orgmode show titles
+  (setq org-startup-folded 'content)
 
   ;; enable company-mode
   (global-company-mode)
@@ -651,7 +671,8 @@ before packages are loaded."
 
   ;; 编码设置 begin
   (setq system-time-locale "C") ;; test:(format-time-string "%Y-%m-%d %a")
-  (set-language-environment 'Chinese-GB)
+  ;;(set-language-environment 'Chinese-GB)
+  (set-language-environment "UTF-8")
   (set-default buffer-file-coding-system 'utf-8-unix)
   (set-default-coding-systems 'utf-8-unix)
   (setq-default pathname-coding-system 'euc-cn)
@@ -664,7 +685,7 @@ before packages are loaded."
   (prefer-coding-system 'gb2312)
   (prefer-coding-system 'cp936)
   (prefer-coding-system 'gb18030)
-                                        ;(prefer-coding-system 'utf-16le-with-signature)
+  ;;(prefer-coding-system 'utf-16le-with-signature)
   (prefer-coding-system 'utf-16)
   ;; 新建文件使用utf-8-unix方式
   ;; 如果不写下面两句，只写

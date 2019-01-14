@@ -8,13 +8,9 @@
   "blog-admin files location")
 
 (setq-default
- home-dir (cond
-       ((eq system-type 'windows-nt) "D:/Home/")
-       ((eq system-type 'gnu/linux) "/home/dinghmcn/")
-       )
- org-agenda-dir (concat home-dir "Documents/Nutstore/GTD")
- deft-dir (concat home-dir "Documents/Nutstore/Notes")
- blog-dir (concat home-dir "Documents/Blog")
+ org-agenda-dir "~/Documents/OneDrive/Documents/GTD"
+ deft-dir "~/Documents/OneDrive/Documents/Notes"
+ blog-dir "~/Documents/Blog"
  blog-admin-dir blog-dir)
 
 ;;load sensitive data
