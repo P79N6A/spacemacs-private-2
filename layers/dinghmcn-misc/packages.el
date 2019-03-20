@@ -219,7 +219,10 @@
   (use-package helm-github-stars
     :commands (helm-github-stars)
     :init
-    (setq helm-github-stars-username "dinghmcn")))
+    (setq helm-github-stars-username "dinghmcn")
+    (setq helm-github-stars-name-length nil)
+    (setq helm-github-stars-token "cb012bdfe1ab3cb10098145671cfb10169934de6")
+    ))
 
 (defun dinghmcn-misc/post-init-fcitx ()
   (fcitx-aggressive-setup))

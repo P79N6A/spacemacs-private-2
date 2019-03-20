@@ -69,13 +69,7 @@ This function should only modify configuration layer settings."
      deft
      ;; docker
      emacs-lisp
-     (git :variables
-          git-magit-status-fullscreen t
-          magit-push-always-verify nil
-          magit-save-repository-buffers 'dontask
-          magit-revert-buffers 'silent
-          magit-refs-show-commit-count 'all
-          magit-revision-show-gravatars nil)
+     git
      github
      ;;gpu
      graphviz
@@ -131,9 +125,7 @@ This function should only modify configuration layer settings."
 
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages '(
-                                    ;;counsel-projectile
-                                    clojure-cheatsheet
-                                    forge
+                                    counsel-projectile  ;; remove ivy
                                     )
 
    ;; Defines the behaviour of Spacemacs when installing packages.
@@ -523,35 +515,34 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
+  ;; debug info
+  ;;(setq debug-on-error t)
+
   ;; delete server file
   (if (file-exists-p "~/.emacs.d/server/server")
       (delete-file "~/.emacs.d/server/server"))
-
   ;;设置窗口位置为屏库左上角(200,80)
   ;;(set-frame-position (selected-frame) 200 88)
   ;;设置宽和高,我的十寸小本是110,33,大家可以调整这个参数来适应自己屏幕大小
   ;;(setq default-frame-alist '((height . 40) (width . 128) (menu-bar-lines . 0)))
+  (defun dinghmcn/set-frame-position-size (position-x position-y frame-width frame-height)
+    (interactive)
+    (progn
+      (set-frame-position (selected-frame)
+                          (round (* (x-display-pixel-width) position-x))
+                          (round (* (x-display-pixel-height) position-y)))
+      (add-to-list 'default-frame-alist
+                   (cons 'width (round (* (/ (x-display-pixel-width) (frame-char-width)) frame-width))))
+      (add-to-list 'default-frame-alist
+                   (cons 'height (round (* (/ (x-display-pixel-height) (frame-char-height)) frame-height))))))
+
   (if window-system
       (cond
        ((spacemacs/system-is-mswindows)
-        (progn
-          (set-frame-position (selected-frame)
-                              (round (* (x-display-pixel-width) 0.158))
-                              (round (* (x-display-pixel-height) 0.08)))
-          (add-to-list 'default-frame-alist
-                       (cons 'width (round (* (/ (x-display-pixel-width) (frame-char-width)) 0.65))))
-          (add-to-list 'default-frame-alist
-                       (cons 'height (round (* (/ (x-display-pixel-height) (frame-char-height)) 0.75) )))))
+        (dinghmcn/set-frame-position-size 0.158 0.08 0.65 0.75))
        ((spacemacs/system-is-linux)
-        (progn
-          (set-frame-position (selected-frame)
-                              (round (* (x-display-pixel-width) 0.158))
-                              (round (* (x-display-pixel-height) 0.08)))
-          (add-to-list 'default-frame-alist
-                       (cons 'width (round (* (/ (x-display-pixel-width) (frame-char-width)) 0.5))))
-          (add-to-list 'default-frame-alist
-                       (cons 'height (round (* (/ (x-display-pixel-height) (frame-char-height)) 0.6) ))))))
-    )
+        (dinghmcn/set-frame-position-size 0.158 0.08 0.5 0.6))))
+
   (let ((num 3))
     (cond
      ((eq num 1) (setq configuration-layer-elpa-archives
@@ -650,24 +641,20 @@ before packages are loaded."
   (setq powerline-default-separator 'zigzag)
 
   ;; Setting Chinese Font
+  (defun dinghmcn/set-font (english english-size chinese chinese-size)
+    (interactive)
+    (set-face-attribute 'default nil :font
+                        (format   "%s:pixelsize=%d"  english english-size))
+
+    (dolist (charset '(kana han cjk-misc bopomofo))
+      (set-fontset-font (frame-parameter nil 'font) charset
+                        (font-spec :family chinese :size chinese-size))))
   (cond
    ((spacemacs/system-is-mswindows)
-    (setq ispell-program-name "aspell")
-    (setq w32-pass-alt-to-system nil)
-    (setq w32-apps-modifier 'super)
-    (dolist
-        (charset '(kana han symbol cjk-misc bopomofo))
-      (set-fontset-font
-       (frame-parameter nil 'font)
-       charset
-       (font-spec :family "Microsoft Yahei" :size 16))))
+    (dinghmcn/set-font "Source Code Variable" 13 "Microsoft Yahei" 16))
    ((spacemacs/system-is-linux)
-    (dolist
-        (charset '(kana han symbol cjk-misc bopomofo))
-      (set-fontset-font
-       (frame-parameter nil 'font)
-       charset
-       (font-spec :family "Noto Sans CJK SC" :size 16)))))
+    (dinghmcn/set-font "Source Code Pro" 13 "Noto Sans CJK SC" 16)))
+
 
   ;; 编码设置 begin
   (setq system-time-locale "C") ;; test:(format-time-string "%Y-%m-%d %a")

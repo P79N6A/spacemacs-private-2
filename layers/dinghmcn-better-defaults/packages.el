@@ -39,7 +39,7 @@
             "\\.srt$"
             "\\.ass$"
             ".*png$"
-            "/.emacs.d/.cache/"
+            "/.emacs.d/"
             "/Documents/OneDrive/Documents/GTD/"))
     (setq recentf-max-saved-items 2048)))
 
