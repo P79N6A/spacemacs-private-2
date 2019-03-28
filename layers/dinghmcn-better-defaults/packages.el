@@ -40,7 +40,7 @@
             "\\.ass$"
             ".*png$"
             "/.emacs.d/"
-            "/Documents/OneDrive/Documents/GTD/"))
+            "/Documents/Nutstore/GTD/"))
     (setq recentf-max-saved-items 2048)))
 
 (defun dinghmcn-better-defaults/init-dired-mode ()

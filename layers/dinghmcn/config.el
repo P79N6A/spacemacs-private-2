@@ -4,14 +4,13 @@
 (defvar deft-dir ""
   "deft org files locaiton")
 
-(defvar blog-admin-dir ""
-  "blog-admin files location")
+(defvar blog-dir ""
+  "blog-dir files location")
 
 (setq-default
- org-agenda-dir "~/Documents/OneDrive/Documents/GTD"
- deft-dir "~/Documents/OneDrive/Documents/Notes"
- blog-dir "~/Documents/Blog"
- blog-admin-dir blog-dir)
+ org-agenda-dir "~/Documents/Nutstore/GTD"
+ deft-dir "~/Documents/Nutstore/Notes"
+ blog-dir "~/Documents/Blog")
 
 ;;load sensitive data
 ;; or (like spacemacs init.el)put the above variable into it ,then the own value separated from public config
@@ -19,7 +18,7 @@
 ;; (setq-default
 ;;  org-agenda-dir "~/Dropbox/Apps/emacs/gtd"
 ;;  deft-dir "~/Dropbox/Apps/emacs/notes"
-;;  blog-admin-dir "~/Documents/hexo"
+;;  blog-dir "~/Documents/hexo"
 ;;  )
 ;; (slack-register-team
 ;;   :name "emacs-slack"

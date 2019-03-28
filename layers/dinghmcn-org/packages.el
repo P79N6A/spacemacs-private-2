@@ -30,7 +30,7 @@
     (progn
       ;; do your configuration here
       (setq blog-admin-backend-type 'hexo
-            blog-admin-backend-path blog-admin-dir
+            blog-admin-backend-path blog-dir
             blog-admin-backend-new-post-in-drafts t
             blog-admin-backend-new-post-with-same-name-dir t
             blog-admin-backend-hexo-config-file "_config.yml"
