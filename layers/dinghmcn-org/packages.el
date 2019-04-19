@@ -16,33 +16,27 @@
     (org :location built-in)
     org-pomodoro
     deft
-    blog-admin
-    hexo
+    easy-hugo
     )
   )
 
-(defun dinghmcn-org/init-blog-admin ()
-  (use-package blog-admin
-    :defer t
-    :commands blog-admin-start
-    :init
-    :config
-    (progn
-      ;; do your configuration here
-      (setq blog-admin-backend-type 'hexo
-            blog-admin-backend-path blog-dir
-            blog-admin-backend-new-post-in-drafts t
-            blog-admin-backend-new-post-with-same-name-dir t
-            blog-admin-backend-hexo-config-file "_config.yml"
-            )
-      (add-hook 'blog-admin-backend-after-new-post-hook 'find-file)
-      )))
-
-(defun dinghmcn-org/init-hexo ()
+(defun dinghmcn-org/init-easy-hugo ()
   (progn
     ;; do your configuration here
     (setq
-     hexo-posix-compatible-shell-file-path "/bin/zsh"
+     easy-hugo-basedir blog-dir
+     easy-hugo-url "https://dinghmcn.github.io/"
+     easy-hugo-sshdomain "github.io"
+     ;;easy-hugo-root blog-dir/public
+     easy-hugo-postdir "content/static/"
+     easy-hugo-default-ext ".org"
+     easy-hugo-org-header nil
+     ;;easy-hugo-image-directory "img"
+     ;;easy-hugo-default-picture-directory "~/Pictures"
+     easy-hugo-previewtime "300"
+     easy-hugo-sort-default-char nil
+     easy-hugo-helm-ag t
+     easy-hugo-no-help nil
      )))
 
 (defun dinghmcn-org/post-init-org-pomodoro ()
@@ -59,7 +53,6 @@
   (add-hook 'org-mode-hook (lambda () (spacemacs/toggle-line-numbers-off)) 'append)
   (with-eval-after-load 'org
     (progn
-
       (spacemacs|disable-company org-mode)
       (spacemacs/set-leader-keys-for-major-mode 'org-mode
         "," 'org-priority)

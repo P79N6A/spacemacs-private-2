@@ -44,10 +44,10 @@
       (spacemacs/set-leader-keys "hh" 'highlight-frame-toggle)
       (spacemacs/set-leader-keys "hc" 'clear-highlight-frame)
       (setq-default highlight-faces
-        '(('hi-red-b . 0)
-          ('hi-yellow . 0)
-          ('hi-pink . 0)
-          ('hi-blue-b . 0))))))
+                    '(('hi-red-b . 0)
+                      ('hi-yellow . 0)
+                      ('hi-pink . 0)
+                      ('hi-blue-b . 0))))))
 
 (defun dinghmcn-misc/post-init-golden-ratio ()
   (with-eval-after-load 'golden-ratio
@@ -87,7 +87,7 @@
   (progn
     (defhydra hydra-hotspots (:color blue)
       "Hotspots"
-      ("b" blog-admin-start "blog")
+      ("b" eazy-hugo "blog")
       ("g" helm-github-stars "helm github stars")
       ("r" dinghmcn/run-current-file "run current file"))
 
@@ -219,10 +219,11 @@
   (use-package helm-github-stars
     :commands (helm-github-stars)
     :init
-    (setq helm-github-stars-username "dinghmcn")
-    (setq helm-github-stars-name-length nil)
-    (setq helm-github-stars-token "cb012bdfe1ab3cb10098145671cfb10169934de6")
-    ))
+    (setq helm-github-stars-username "dinghmcn"
+          helm-github-stars-name-length nil
+          helm-github-stars-refetch-time 0.5
+          helm-github-stars-token "d2a18159d4b1454eecd2930e8db06f4baba2e92d"
+          )))
 
 (defun dinghmcn-misc/post-init-fcitx ()
   (fcitx-aggressive-setup))

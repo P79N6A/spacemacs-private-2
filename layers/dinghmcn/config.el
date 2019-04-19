@@ -8,9 +8,9 @@
   "blog-dir files location")
 
 (setq-default
- org-agenda-dir "~/Documents/Nutstore/GTD"
- deft-dir "~/Documents/Nutstore/Notes"
- blog-dir "~/Documents/Blog")
+ org-agenda-dir "~/Documents/Nutstore/GTD/"
+ deft-dir "~/Documents/Nutstore/Blog/static/"
+ blog-dir "~/Documents/Blog/")
 
 ;;load sensitive data
 ;; or (like spacemacs init.el)put the above variable into it ,then the own value separated from public config

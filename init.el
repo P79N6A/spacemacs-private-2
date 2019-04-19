@@ -64,8 +64,7 @@ This function should only modify configuration layer settings."
      (colors :variables
              colors-enable-nyan-cat-progress-bar t
              colors-colorize-identifiers 'all)
-     (dash :variables
-           helm-dash-docset-newpath "~/.docsets")
+     (dash :variables helm-dash-docset-newpath "~/.docsets")
      deft
      ;; docker
      emacs-lisp
@@ -89,21 +88,31 @@ This function should only modify configuration layer settings."
      markdown
      (org :variables
           org-enable-github-support t
+          org-enable-hugo-support t
+          org-hugo-default-section-directory "post"
+          org-hugo-auto-set-lastmod t
+          org-export-with-author nil
+          org-hugo-external-file-extensions-allowed-for-copying
+          '("jpg" "jpeg" "tiff" "png" "svg" "gif" "pdf" "odt"
+            "doc" "ppt" "xls" "docx" "pptx" "xlsx" "java")
           org-want-todo-bindings t)
      plantuml
      (python :variables
              python-test-runner '(pytest nose)
              python-enable-yapf-format-on-save t)
      ranger
+     rust
      ;;search-engine
      (shell :variables
             shell-default-shell 'zshell
             shell-default-height 30
             shell-default-position 'bottom)
-     (spacemacs-layouts :variables layouts-enable-autosave nil
+     (spacemacs-layouts :variables
+                        layouts-enable-autosave nil
                         layouts-autosave-delay 300)
      (spell-checking :variables spell-checking-enable-by-default nil)
-     (syntax-checking :variables syntax-checking-enable-by-default nil
+     (syntax-checking :variables
+                      syntax-checking-enable-by-default nil
                       syntax-checking-enable-tooltips nil)
      version-control
      (vinegar :variables vinegar-reuse-dired-buffer t)

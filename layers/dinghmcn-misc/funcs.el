@@ -58,14 +58,14 @@
   (interactive)
   (persp-save-state-to-file (concat persp-save-dir "dinghm")))
 
-  ;; my fix for tab indent
+;; my fix for tab indent
 (defun dinghmcn/indent-region(numSpaces)
   (progn
-                                      ; default to start and end of current line
+                                        ; default to start and end of current line
     (setq regionStart (line-beginning-position))
     (setq regionEnd (line-end-position))
 
-                                      ; if there's a selection, use that instead of the current line
+                                        ; if there's a selection, use that instead of the current line
     (when (use-region-p)
       (setq regionStart (region-beginning))
       (setq regionEnd (region-end))
@@ -129,8 +129,7 @@ org-files and bookmarks"
   `((name . "Mail and News")
     (candidates . (("Calendar" . (lambda ()  (browse-url "https://www.google.com/calendar/render")))
                    ("RSS" . elfeed)
-                   ("Hexo" . (lambda() (hexo blog-dir)))
-                   ("Blog" . blog-admin-start)
+                   ("Blog" . easy-hugo)
                    ("Github" . (lambda() (helm-github-stars)))
                    ("Calculator" . (lambda() (helm-calcul-expression)))
                    ("Run current flie" . (lambda () (dinghmcn/run-current-file)))
