@@ -189,7 +189,7 @@ It should only modify the values of Spacemacs settings."
    ;; This is an advanced option and should not be changed unless you suspect
    ;; performance issues due to garbage collection operations.
    ;; (default '(100000000 0.1))
-   dotspacemacs-gc-cons '(100000000 0.1)
+   dotspacemacs-gc-cons '(800000000 0.1)
 
    ;; If non-nil then Spacelpa repository is the primary source to install
    ;; a locked version of packages. If nil then Spacemacs will install the
@@ -499,7 +499,7 @@ It should only modify the values of Spacemacs settings."
    ;; `trailing' to delete only the whitespace at end of lines, `changed' to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup nil
+   dotspacemacs-whitespace-cleanup 'trailing
 
    ;; Either nil or a number of seconds. If non-nil zone out after the specified
    ;; number of seconds. (default nil)
@@ -525,7 +525,7 @@ configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;; debug info
-  ;;(setq debug-on-error t)
+  (setq debug-on-error nil)
 
   ;; delete server file
   (if (file-exists-p "~/.emacs.d/server/server")
@@ -548,7 +548,13 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (if window-system
       (cond
        ((spacemacs/system-is-mswindows)
-        (dinghmcn/set-frame-position-size 0.158 0.08 0.65 0.75))
+        (progn
+          (dinghmcn/set-frame-position-size 0.158 0.08 0.65 0.75)
+          ;; 垃圾回收
+          (run-with-idle-timer 37 t #'garbage-collect)
+          ;; 显示垃圾回收信息，这个可以作为调试用
+          ;; (setq garbage-collection-messages t)
+          ))
        ((spacemacs/system-is-linux)
         (dinghmcn/set-frame-position-size 0.158 0.08 0.5 0.6))))
 

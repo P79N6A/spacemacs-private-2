@@ -219,11 +219,24 @@
   (use-package helm-github-stars
     :commands (helm-github-stars)
     :init
-    (setq helm-github-stars-username "dinghmcn"
-          helm-github-stars-name-length nil
-          helm-github-stars-refetch-time 0.5
-          helm-github-stars-token "d2a18159d4b1454eecd2930e8db06f4baba2e92d"
-          )))
+    (progn
+      ;; tls
+      (require 'tls)
+      (setq gnutls-verify-error t
+            gnutls-min-prime-bits 2048
+            gnutls-algorithm-priority "SECURE192:+SECURE128:-VERS-ALL:+VERS-TLS1.2"
+            nsm-settings-file (expand-file-name "network-security.data" "~/.emacs.d/.cache/")
+            nsm-save-host-names t
+            network-security-level 'high
+            tls-checktrust t
+            tls-process-connection-type t
+            tls-program '("gnutls-cli -p %p --dh-bits=2048 --ocsp --x509cafile=%t --priority='SECURE192:+SECURE128:-VERS-ALL:+VERS-TLS1.2:%%PROFILE_MEDIUM' %h"))
+
+      (setq helm-github-stars-username "dinghmcn"
+            helm-github-stars-token "5dd8d48a82f2810183c1a1cd42d92f38d1af0fce"
+            helm-github-stars-name-length 30
+            helm-github-stars-full-frame t
+            helm-github-stars-refetch-time 0.5))))
 
 (defun dinghmcn-misc/post-init-fcitx ()
   (fcitx-aggressive-setup))

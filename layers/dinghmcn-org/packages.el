@@ -80,21 +80,21 @@
 
       ;; 加密文章
       ;; "http://coldnew.github.io/blog/2013/07/13_5b094.html"
-      ;; org-mode 設定
+      ;; org-mode 设定
       (require 'org-crypt)
 
-      ;; 當被加密的部份要存入硬碟時，自動加密回去
+      ;; 当被加密的部份要存入硬碟时，自动加密回去
       (org-crypt-use-before-save-magic)
 
-      ;; 設定要加密的 tag 標籤為 secret
+      ;; 设定要加密的 tag 标签为 secret
       (setq org-crypt-tag-matcher "secret")
 
-      ;; 避免 secret 這個 tag 被子項目繼承 造成重複加密
-      ;; (但是子項目還是會被加密喔)
+      ;; 避免 secret 这个 tag 被子项目继承 造成重复加密
+      ;; (但是子项目还是会被加密喔)
       (setq org-tags-exclude-from-inheritance (quote ("secret")))
 
-      ;; 用於加密的 GPG 金鑰
-      ;; 可以設定任何 ID 或是設成 nil 來使用對稱式加密 (symmetric encryption)
+      ;; 用于加密的 GPG 金钥
+      ;; 可以设定任何 ID 或是设成 nil 来使用对称式加密 (symmetric encryption)
       (setq org-crypt-key nil)
 
       ;; (add-to-list 'auto-mode-alist '("\.org\\'" . org-mode))
