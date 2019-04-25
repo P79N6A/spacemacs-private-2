@@ -530,6 +530,11 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;; delete server file
   (if (file-exists-p "~/.emacs.d/server/server")
       (delete-file "~/.emacs.d/server/server"))
+
+  ;; load "custom.el"
+  (setq custom-file (expand-file-name "custom.el" dotspacemacs-directory))
+  (load custom-file)
+
   ;;设置窗口位置为屏库左上角(200,80)
   ;;(set-frame-position (selected-frame) 200 88)
   ;;设置宽和高,我的十寸小本是110,33,大家可以调整这个参数来适应自己屏幕大小
@@ -697,6 +702,3 @@ before packages are loaded."
   (prefer-coding-system 'utf-8-unix)
   ;; 编码设置 end
   )
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
