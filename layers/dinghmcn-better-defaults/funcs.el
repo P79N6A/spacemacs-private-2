@@ -145,3 +145,26 @@ open and unsaved."
   "goto up directory and resue buffer"
   (interactive)
   (find-alternate-file ".."))
+
+(defun dinghmcn/insert-space-after-point ()
+  (interactive)
+  (save-excursion (insert " ")))
+
+
+(defmacro dakra-define-up/downcase-dwim (case)
+  (let ((func (intern (concat "dakra-" case "-dwim")))
+        (doc (format "Like `%s-dwim' but %s from beginning when no region is active." case case))
+        (case-region (intern (concat case "-region")))
+        (case-word (intern (concat case "-word"))))
+    `(defun ,func (arg)
+       ,doc
+       (interactive "*p")
+       (save-excursion
+         (if (use-region-p)
+             (,case-region (region-beginning) (region-end))
+           (beginning-of-thing 'symbol)
+           (,case-word arg))))))
+
+(dakra-define-up/downcase-dwim "upcase")
+(dakra-define-up/downcase-dwim "downcase")
+(dakra-define-up/downcase-dwim "capitalize")

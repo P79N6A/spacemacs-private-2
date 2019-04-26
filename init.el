@@ -56,8 +56,8 @@ This function should only modify configuration layer settings."
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c++-mode
             c-c++-enable-clang-support t)
-     (chinese :variables
-              chinese-enable-fcitx nil
+     (chinese :packages youdao-dictionary
+              :variables
               chinese-enable-avy-pinyin nil
               chinese-enable-youdao-dict t)
      (clojure :variables clojure-enable-fancify-symbols t)
@@ -134,7 +134,43 @@ This function should only modify configuration layer settings."
 
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages '(
-                                    counsel-projectile  ;; remove ivy
+                                    ac-ispell
+                                    auto-complete
+                                    auto-dictionary
+                                    clang-format
+                                    clean-aindent-mode
+                                    company-quickhelp
+                                    counsel-projectile
+                                    define-word
+                                    disaster
+                                    evil-args
+                                    evil-ediff
+                                    evil-escape
+                                    evil-exchange
+                                    evil-indent-plus
+                                    evil-lisp-state
+                                    evil-unimpaired
+                                    eyebrowse
+                                    fancy-battery
+                                    flx-ido
+                                    flyspell-correct-helm
+                                    gh-md
+                                    git-gutter
+                                    git-gutter-fringe
+                                    google-translate
+                                    highlight-indentation
+                                    lorem-ipsum
+                                    magit-gitflow
+                                    org-bullets
+                                    org-download
+                                    org-present
+                                    orgit
+                                    rainbow-delimiters
+                                    smeargle
+                                    symon
+                                    vi-tilde-fringe
+                                    volatile-highlights
+                                    ws-butler
                                     )
 
    ;; Defines the behaviour of Spacemacs when installing packages.
@@ -524,8 +560,6 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  ;; debug info
-  (setq debug-on-error nil)
 
   ;; delete server file
   (if (file-exists-p "~/.emacs.d/server/server")
@@ -604,25 +638,13 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  ;;解决F1显示helm buffer报错
-  (with-eval-after-load 'helm
-    (setq helm-display-function 'helm-default-display-buffer))
 
   (fset 'evil-visual-update-x-selection 'ignore)
-
-  ;; force horizontal split window
-  (setq split-width-threshold 120)
-
-  ;; use eww to browse your docsets
-  (setq helm-dash-browser-func 'eww)
-
-  ;; orgmode show titles
-  (setq org-startup-folded 'content)
 
   ;; enable company-mode
   (global-company-mode)
 
-  ;;(spacemacs|add-company-backends :modes text-mode)
+  (spacemacs|add-company-backends :modes text-mode)
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
   (global-hungry-delete-mode t)

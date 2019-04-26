@@ -9,6 +9,32 @@
 ;;
 ;;; License: GPLv3
 
+(defmacro th/define-context-key (keymap key dispatch)
+  "Define KEY in KEYMAP to execute according to DISPATCH.
+
+        DISPATCH is a form that is evaluated and should return the
+        command to be executed.
+
+        If DISPATCH returns nil, then the command normally bound to KEY
+        will be executed.
+
+        Example:
+
+          (th/define-context-key hs-minor-mode-map
+             (kbd \"<C-tab>\")
+             (cond
+              ((not (hs-already-hidden-p))
+               'hs-hide-block)
+              ((hs-already-hidden-p)
+               'hs-show-block)))
+
+        This will make <C-tab> show a hidden block.  If the block is
+        shown, then it'll be hidden."
+  `(define-key ,keymap ,key
+     `(menu-item "context-key" ignore
+                 :filter ,(lambda (&optional ignored)
+                            ,dispatch))))
+
 (setq auto-coding-regexp-alist
       (delete (rassoc 'utf-16be-with-signature auto-coding-regexp-alist)
               (delete (rassoc 'utf-16le-with-signature auto-coding-regexp-alist)
@@ -25,6 +51,9 @@
 
 (global-prettify-symbols-mode 1)
 (setq-default fill-column 80)
+
+;; prevent dired window press o to split into three column
+(setq-default split-width-threshold 200)
 
 (setq recenter-positions '(top middle bottom))
 ;; delete the selection with a key press
@@ -64,9 +93,11 @@
 ;; (set-default 'imenu-auto-rescan t)
 
 ;; https://www.reddit.com/r/emacs/comments/4c0mi3/the_biggest_performance_improvement_to_emacs_ive/
-;; (remove-hook 'find-file-hooks 'vc-find-file-hook)
+(remove-hook 'find-file-hooks 'vc-find-file-hook)
 ;; https://stackoverflow.com/questions/5748814/how-does-one-disable-vc-git-in-emacs
 ;; this settings will cause command `vc-annotate` failed.
+;; 如果把 vc-handled-backends去掉，那么 vc-follow-symlinks 这个选项就会失效
+;; 进而，如果你访问一个在版本控制里面的alias的话，它不会自动去访问原文件，这个是非常不爽的
 ;; (setq vc-handled-backends ())
 
 
@@ -140,7 +171,7 @@ Single Capitals as you type."
   (if (and (executable-find "wc")
            (> (string-to-number (shell-command-to-string (format "wc -l %s" (buffer-file-name))))
               5000))
-      (linum-mode -1)))
+      nil))
 
 (add-hook 'find-file-hook 'spacemacs/check-large-file)
 
@@ -183,3 +214,45 @@ Single Capitals as you type."
 (setq backup-by-copying t
       make-backup-files nil
       create-lockfiles nil)
+
+;; search chinse must add this line
+;; https://emacs-china.org/t/emacs-helm-ag/6764
+(if (spacemacs/system-is-mswindows)
+    (modify-coding-system-alist 'process "rg" '(utf-8 . chinese-gbk-dos))
+  (modify-coding-system-alist 'process "rg" '(utf-8 . utf-8)))
+
+
+;; https://emacs-china.org/t/advice/7566
+(defun chunyang-advice-remove-button (function)
+  "Add a button to remove advice."
+  (when (get-buffer "*Help*")
+    (with-current-buffer "*Help*"
+      (save-excursion
+        (goto-char (point-min))
+        ;; :around advice: ‘shell-command--shell-command-with-editor-mode’
+        (while (re-search-forward "^:[-a-z]+ advice: [‘'`]\\(.+\\)[’'']$" nil t)
+          (let ((advice (intern-soft (match-string 1))))
+            (when (and advice (fboundp advice))
+              (let ((inhibit-read-only t))
+                (insert " » ")
+                (insert-text-button
+                 "Remove"
+                 'action
+                 ;; In case lexical-binding is off
+                 `(lambda (_)
+                    (message "Removing %s of advice from %s" ',function ',advice)
+                    (advice-remove ',function #',advice)
+                    (revert-buffer nil t))
+                 'follow-link t)))))))))
+
+(advice-add 'describe-function-1 :after #'chunyang-advice-remove-button)
+
+(defun dinghm-ag-edit (function)
+  (when (get-buffer "*helm-ag-edit*")
+    (kill-buffer "*helm-ag-edit*"))
+  (if (not (= (count-windows) 2))
+      (progn
+        (split-window-right))))
+
+(advice-add 'helm-ag--edit :before #'dinghm-ag-edit)
+;; (advice-add 'helm-ag--edit :after #'dinghm-after-ag-edit)

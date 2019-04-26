@@ -15,8 +15,6 @@
     diminish
     popwin
     (whitespace :location built-in)
-    ;; hl-anything performance is very slow...
-    ;; hl-anything
     ;; if you wnat to use spaceline, please comment out dinghm-mode-line
     ;; spaceline
     ;; beacon
@@ -46,22 +44,26 @@
 
   (setq my-flycheck-mode-line
         '(:eval
-          (pcase flycheck-last-status-change
-            ((\` not-checked) nil)
-            ((\` no-checker) (propertize " -" 'face 'warning))
-            ((\` running) (propertize " ✷" 'face 'success))
-            ((\` errored) (propertize " !" 'face 'error))
-            ((\` finished)
-             (let* ((error-counts (flycheck-count-errors flycheck-current-errors))
-                    (no-errors (cdr (assq 'error error-counts)))
-                    (no-warnings (cdr (assq 'warning error-counts)))
-                    (face (cond (no-errors 'error)
-                                (no-warnings 'warning)
-                                (t 'success))))
-               (propertize (format "[%s/%s]" (or no-errors 0) (or no-warnings 0))
-                           'face face)))
-            ((\` interrupted) " -")
-            ((\` suspicious) '(propertize " ?" 'face 'warning)))))
+          (when
+              (and (bound-and-true-p flycheck-mode)
+                   (or flycheck-current-errors
+                       (eq 'running flycheck-last-status-change)))
+            (pcase flycheck-last-status-change
+              ((\` not-checked) nil)
+              ((\` no-checker) (propertize " -" 'face 'warning))
+              ((\` running) (propertize " ✷" 'face 'success))
+              ((\` errored) (propertize " !" 'face 'error))
+              ((\` finished)
+               (let* ((error-counts (flycheck-count-errors flycheck-current-errors))
+                      (no-errors (cdr (assq 'error error-counts)))
+                      (no-warnings (cdr (assq 'warning error-counts)))
+                      (face (cond (no-errors 'error)
+                                  (no-warnings 'warning)
+                                  (t 'success))))
+                 (propertize (format "[%s/%s]" (or no-errors 0) (or no-warnings 0))
+                             'face face)))
+              ((\` interrupted) " -")
+              ((\` suspicious) '(propertize " ?" 'face 'warning))))))
 
   (setq-default mode-line-misc-info
                 (assq-delete-all 'which-func-mode mode-line-misc-info))
@@ -69,11 +71,12 @@
   (setq-default mode-line-format
                 (list
                  " %1"
-                 '(:eval (propertize
-                          (window-number-mode-line)
-                          'face
-                          'font-lock-type-face))
+                 '(:eval (when (bound-and-true-p winum-mode) (propertize
+                                                              (window-number-mode-line)
+                                                              'face
+                                                              'font-lock-type-face)))
                  " "
+                 '(:eval (dinghm/modeline--evil-substitute))
                  '(:eval (dinghmcn/update-persp-name))
 
                  "%1 "
@@ -103,9 +106,6 @@
                                                    'help-echo "Buffer is read-only"))))
                  "] "
 
-                 ;; anzu
-                 ;;anzu--mode-line-format
-
                  ;; relative position, size of file
                  "["
                  (propertize "%p" 'face 'font-lock-constant-face) ;; % above top
@@ -128,7 +128,7 @@
                            minor-mode-alist))
                  " "
                  ;; git info
-                 '(:eval (when (> (window-width) 120)
+                 '(:eval (when (> (window-width) 90)
                            `(vc-mode vc-mode)))
 
                  " "
@@ -137,7 +137,7 @@
                  '(:eval (when (> (window-width) 120)
                            mode-line-misc-info))
 
-                 (mode-line-fill 'mode-line 20)
+                 (mode-line-fill 'mode-line 25)
 
                  '(:eval (dinghmcn/display-mode-indent-width))
                  ;; line and column
@@ -154,7 +154,13 @@
                  ;;                     'help-echo
                  ;;                     (concat (format-time-string "%c; ")
                  ;;                             (emacs-uptime "Uptime:%hh"))))
-                 )))
+                 ))
+
+  ;; remove which func from modeline
+  (setq mode-line-misc-info (cdr mode-line-misc-info))
+  ;; git branch on mode line may have some performance issue
+  ;; (setq auto-revert-check-vc-info t)
+  )
 
 (defun dinghmcn-ui/post-init-diminish ()
   (progn
@@ -177,41 +183,41 @@
         "The function called by the `org-clock' segment to determine what to show.")
 
       (spaceline-define-segment org-clock
-                                "Show information about the current org clock task.  Configure
+        "Show information about the current org clock task.  Configure
 `spaceline-org-clock-format-function' to configure. Requires a currently running
 org clock.
 
 This segment overrides the modeline functionality of `org-mode-line-string'."
-                                (when (and (fboundp 'org-clocking-p)
-                                           (org-clocking-p))
-                                  (substring-no-properties (funcall spaceline-org-clock-format-function)))
-                                :global-override org-mode-line-string)
+        (when (and (fboundp 'org-clocking-p)
+                   (org-clocking-p))
+          (substring-no-properties (funcall spaceline-org-clock-format-function)))
+        :global-override org-mode-line-string)
 
       (spaceline-compile
-       'dinghm
-       ;; Left side of the mode line (all the important stuff)
-       '(((persp-name
-           workspace-number
-           window-number
-           )
-          :separator "|"
-          :face highlight-face)
-         ((buffer-modified buffer-size input-method))
-         anzu
-         '(buffer-id remote-host buffer-encoding-abbrev)
-         ((point-position line-column buffer-position selection-info)
-          :separator " | ")
-         major-mode
-         process
-         (flycheck-error flycheck-warning flycheck-info)
-         ;; (python-pyvenv :fallback python-pyenv)
-         ((minor-modes :separator spaceline-minor-modes-separator) :when active)
-         (org-pomodoro :when active)
-         (org-clock :when active)
-         nyan-cat)
-       ;; Right segment (the unimportant stuff)
-       '((version-control :when active)
-         battery))
+        'dinghm
+        ;; Left side of the mode line (all the important stuff)
+        '(((persp-name
+            workspace-number
+            window-number
+            )
+           :separator "|"
+           :face highlight-face)
+          ((buffer-modified buffer-size input-method))
+          anzu
+          '(buffer-id remote-host buffer-encoding-abbrev)
+          ((point-position line-column buffer-position selection-info)
+           :separator " | ")
+          major-mode
+          process
+          (flycheck-error flycheck-warning flycheck-info)
+          ;; (python-pyvenv :fallback python-pyenv)
+          ((minor-modes :separator spaceline-minor-modes-separator) :when active)
+          (org-pomodoro :when active)
+          (org-clock :when active)
+          nyan-cat)
+        ;; Right segment (the unimportant stuff)
+        '((version-control :when active)
+          battery))
 
       (setq-default mode-line-format '("%e" (:eval (spaceline-ml-dinghm))))
       )))
@@ -241,21 +247,6 @@ This segment overrides the modeline functionality of `org-mode-line-string'."
       (define-key evil-normal-state-map (kbd "zd") 'vimish-fold-delete)
       (define-key evil-normal-state-map (kbd "za") 'vimish-fold-toggle))))
 
-(defun dinghmcn-ui/post-init-hl-anything ()
-  (progn
-    (defun my-inhibit-globalized-hl-highlight-mode ()
-      "Counter-act a globalized hl-highlight-mode."
-      (set (make-local-variable 'hl-highlight-mode) nil))
-
-    (add-hook 'org-agenda-mode-hook 'my-inhibit-globalized-hl-highlight-mode)
-    (hl-highlight-mode -1)
-    (spacemacs|add-toggle toggle-hl-anything
-      :status hl-highlight-mode
-      :on (hl-highlight-mode)
-      :off (hl-highlight-mode -1)
-      :documentation "Toggle highlight anything mode."
-      :evil-leader "ths")))
-
 (defun dinghmcn-ui/post-init-pangu-spacing ()
   (progn
     ;; add toggle options
@@ -267,10 +258,11 @@ This segment overrides the modeline functionality of `org-mode-line-string'."
       :evil-leader "ots")
     (add-hook 'markdown-mode-hook
               #'(lambda ()
-                 (set (make-local-variable 'pangu-spacing-real-insert-separtor) t)))))
+                  (set (make-local-variable 'pangu-spacing-real-insert-separtor) t)))))
 
 (defun dinghmcn-ui/post-init-popwin ()
   (progn
+                                        ;FIXME:
     (push "*dinghmcn/run-current-file output*" popwin:special-display-config)
     (delete "*Async Shell Command*" popwin:special-display-config)))
 

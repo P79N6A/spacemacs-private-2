@@ -10,18 +10,15 @@
 ;;; License: GPLv3
 
 (setq dinghmcn-misc-packages
-      '(helm-github-stars
+      '(
+        helm-github-stars
         projectile
         multiple-cursors
         visual-regexp
         visual-regexp-steroids
         command-log
         evil
-        fcitx
         discover-my-major
-        ace-window
-        avy
-        4clojure
         persp-mode
         tiny
         smartparens
@@ -35,19 +32,59 @@
         ranger
         golden-ratio
         (highlight-global :location (recipe :fetcher github :repo "glen-dai/highlight-global"))
+        symbol-overlay
         ))
 
 (defun dinghmcn-misc/init-highlight-global ()
   (use-package highlight-global
     :init
     (progn
-      (spacemacs/set-leader-keys "hh" 'highlight-frame-toggle)
-      (spacemacs/set-leader-keys "hc" 'clear-highlight-frame)
+
       (setq-default highlight-faces
                     '(('hi-red-b . 0)
                       ('hi-yellow . 0)
                       ('hi-pink . 0)
                       ('hi-blue-b . 0))))))
+
+(defun dinghmcn-misc/init-symbol-overlay ()
+  (use-package symbol-overlay
+    :init
+    (progn
+      (defun symbol-overlay-switch-first ()
+        (interactive)
+        (let* ((symbol (symbol-overlay-get-symbol))
+               (keyword (symbol-overlay-assoc symbol))
+               (a-symbol (car keyword))
+               (before (symbol-overlay-get-list a-symbol 'car))
+               (count (length before)))
+          (symbol-overlay-jump-call 'symbol-overlay-basic-jump (- count))))
+
+      (defun symbol-overlay-switch-last ()
+        (interactive)
+        (let* ((symbol (symbol-overlay-get-symbol))
+               (keyword (symbol-overlay-assoc symbol))
+               (a-symbol (car keyword))
+               (after (symbol-overlay-get-list a-symbol 'cdr))
+               (count (length after)))
+          (symbol-overlay-jump-call 'symbol-overlay-basic-jump (- count 1))))
+
+      (defhydra hydra-hilight-jump (:hint nil)
+        "\n <-- _p_rev _n_ext _t_oggle _<_first _>_last -->\n"
+        ("n" symbol-overlay-jump-next)
+        ("p" symbol-overlay-jump-prev)
+        ("t" symbol-overlay-toggle-in-scope)
+        (">" symbol-overlay-switch-last)
+        ("<" symbol-overlay-switch-first))
+
+      (defvar symbol-overlay-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "n") 'hydra-hilight-jump/body)
+          (define-key map (kbd "p") 'hydra-hilight-jump/body)
+          map)
+        "Keymap automatically activated inside overlays.
+You can re-bind the commands to any keys you prefer.")
+      ))
+  )
 
 (defun dinghmcn-misc/post-init-golden-ratio ()
   (with-eval-after-load 'golden-ratio
@@ -82,6 +119,7 @@
       (define-key ranger-normal-mode-map (kbd "q") 'my-quit-ranger)))
 
   (spacemacs/set-leader-keys "ar" 'my-ranger))
+
 
 (defun dinghmcn-misc/post-init-hydra ()
   (progn
@@ -190,7 +228,7 @@
 (defun dinghmcn-misc/post-init-flyspell-correct ()
   (progn
     (with-eval-after-load 'flyspell
-      (define-key flyspell-mode-map (kbd "C-;") 'flyspell-correct-previous-word-generic))
+      (define-key flyspell-mode-map (kbd "C-;") 'flyspell-correct-previous))
     (setq flyspell-correct-interface 'flyspell-correct-helm)))
 
 (defun dinghmcn-misc/post-init-smartparens ()
@@ -238,9 +276,6 @@
             helm-github-stars-full-frame t
             helm-github-stars-refetch-time 0.5))))
 
-(defun dinghmcn-misc/post-init-fcitx ()
-  (fcitx-aggressive-setup))
-
 (defun dinghmcn-misc/post-init-command-log ()
   (with-eval-after-load 'global-command-log-mode
     (setq clm/log-command-exceptions* (append clm/log-command-exceptions*
@@ -262,29 +297,6 @@
       (setq osx-dictionary-use-chinese-text-segmentation t)
       (global-set-key (kbd "C-c d") 'osx-dictionary-search-pointer)
       )))
-
-
-(defun dinghmcn-misc/init-4clojure ()
-  (use-package 4clojure
-    :init
-    (progn
-      (spacemacs/declare-prefix "o4" "4clojure")
-      (spacemacs/set-leader-keys "o4q" '4clojure-open-question)
-      (spacemacs/set-leader-keys "o4n" '4clojure-next-question)
-      (spacemacs/set-leader-keys "o4p" '4clojure-previous-question)
-      (spacemacs/set-leader-keys "o4c" '4clojure-check-answers)
-      )))
-
-
-
-
-(defun dinghmcn-misc/post-init-avy ()
-  (progn
-    (global-set-key (kbd "C-s-'") 'avy-goto-char-2)
-    (global-set-key (kbd "M-'") 'avy-goto-char-2)))
-
-(defun dinghmcn-misc/post-init-ace-window ()
-  (global-set-key (kbd "C-x C-o") #'ace-window))
 
 (defun dinghmcn-misc/init-discover-my-major ()
   (use-package discover-my-major
@@ -393,6 +405,11 @@
     (define-key evil-normal-state-map (kbd "[ SPC") (lambda () (interactive) (evil-insert-newline-above) (forward-line)))
     (define-key evil-normal-state-map (kbd "] SPC") (lambda () (interactive) (evil-insert-newline-below) (forward-line -1)))
 
+    (define-key evil-normal-state-map (kbd "g[")
+      (lambda () (interactive) (beginning-of-defun)))
+
+    (define-key evil-normal-state-map (kbd "g]")
+      (lambda () (interactive) (end-of-defun)))
 
     (define-key evil-normal-state-map (kbd "[ b") 'previous-buffer)
     (define-key evil-normal-state-map (kbd "] b") 'next-buffer)
@@ -479,6 +496,7 @@
       (bind-key* "C-s-l" 'mc/edit-lines)
       (bind-key* "C-s-f" 'mc/mark-all-dwim)
       (bind-key* "C-s-." 'mc/mark-next-like-this)
+      (bind-key* "s-." 'mc/mark-next-like-this)
       (bind-key* "C-s-," 'mc/mark-previous-like-this)
       (bind-key* "s->" 'mc/unmark-next-like-this)
       (bind-key* "s-<" 'mc/unmark-previous-like-this)
@@ -541,8 +559,18 @@
     ))
 
 (defun dinghmcn-misc/post-init-persp-mode ()
-  (setq persp-kill-foreign-buffer-action 'kill)
+  (setq persp-kill-foreign-buffer-behaviour 'kill)
   (setq persp-lighter nil)
+
+  (defun dinghmcn-kill-other-persp-buffers (&optional arg)
+    "Kill all other buffers in current persp layout"
+    (interactive)
+    (when (yes-or-no-p (format "Killing all buffers except \"%s\"? "
+                               (buffer-name)))
+      (mapc 'persp-kill-buffer (delq (current-buffer) (persp-buffer-list)))
+      (persp-add-buffer (current-buffer))
+      (message "Buffers deleted!")))
+
   (when (fboundp 'spacemacs|define-custom-layout)
     (spacemacs|define-custom-layout "@Cocos2D-X"
       :binding "c"
@@ -569,6 +597,7 @@
 
 (defun dinghmcn-misc/post-init-evil-escape ()
   (setq evil-escape-delay 0.2))
+
 
 (defun dinghmcn-misc/post-init-projectile ()
   (progn
@@ -646,7 +675,7 @@
         (setq magit-completing-read-function 'magit-builtin-completing-read)
 
         (magit-define-popup-switch 'magit-push-popup ?u
-          "Set upstream" "--set-upstream")
+                                   "Set upstream" "--set-upstream")
         ))
 
     ;; prefer two way ediff

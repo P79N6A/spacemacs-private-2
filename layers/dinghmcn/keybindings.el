@@ -27,7 +27,6 @@
 
 (global-set-key (kbd "C-c b") 'org-iswitchb)
 (global-set-key (kbd "C-c i e") 'spacemacs/auto-yasnippet-expand)
-(global-set-key (kbd "C-c i y") 'yas/insert-snippet)
 ;; http://emacs.stackexchange.com/questions/220/how-to-bind-c-i-as-different-from-tab
 ;; (define-key input-decode-map [?\C-i] [C-i])
 ;; (define-key evil-normal-state-map (kbd "C-i") 'evil-jump-forward)
@@ -54,7 +53,7 @@
 ;; (define-key ctl-x-map "\C-t" #'transpose-chars)
 
 (when (spacemacs/system-is-mac)
- (spacemacs/set-leader-keys "o!" 'dinghmcn/iterm-shell-command))
+  (spacemacs/set-leader-keys "o!" 'dinghmcn/iterm-shell-command))
 
 (spacemacs|add-toggle toggle-shadowsocks-proxy-mode
   :status shadowsocks-proxy-mode
@@ -73,11 +72,15 @@
 (bind-key* "s-," 'dinghmcn/insert-comma-at-the-end-of-this-line)
 ;; (bind-key* "C-s-," 'dinghmcn/delete-comma-at-the-end-of-this-line)
 (bind-key* "C-c l" 'dinghmcn/insert-chrome-current-tab-url)
-;; (bind-key* "M-s o" 'occur-dwim)
 (bind-key* "C-=" 'er/expand-region)
 (bind-key* "M--" 'dinghmcn/goto-match-paren)
 (bind-key* "C-c k" 'which-key-show-top-level)
 (bind-key* "s-y" 'aya-expand)
+(bind-key* "C-." 'dinghmcn/insert-space-after-point)
+(bind-key* "M-i" 'string-inflection-java-style-cycle)
+(bind-key* "M-u" 'dakra-upcase-dwim)
+(bind-key* "M-l" 'dakra-downcase-dwim)
+(bind-key* "M-c" 'dakra-capitalize-dwim)
 ;; (bind-key* "C-l" 'recenter)
 
 
@@ -123,9 +126,11 @@
 (spacemacs/set-leader-keys "bms" 'bookmark-set)
 (spacemacs/set-leader-keys "bmr" 'bookmark-rename)
 (spacemacs/set-leader-keys "bmd" 'bookmark-delete)
+(spacemacs/set-leader-keys "bmj" 'bookmark-jump)
 
 (spacemacs/set-leader-keys "od" 'occur-dwim)
-(spacemacs/set-leader-keys "ox" 'org-open-at-point)
+(spacemacs/set-leader-keys "ok" 'dinghmcn-kill-other-persp-buffers)
+(spacemacs/set-leader-keys "ox" 'org-open-at-point-global)
 (spacemacs/set-leader-keys "or" 'dinghmcn/browser-refresh--chrome-applescript)
 
 (spacemacs/set-leader-keys "rh" 'helm-resume)
@@ -146,19 +151,23 @@
 (spacemacs/set-leader-keys "ols" 'dinghmcn/save-my-layout)
 (spacemacs/set-leader-keys "ob" 'popwin:display-last-buffer)
 (spacemacs/set-leader-keys "oy" 'youdao-dictionary-search-at-point+)
-(spacemacs/set-leader-keys "bM" 'view-echo-area-messages)
-
-(spacemacs/set-leader-keys "os" 'dinghmcn/search-in-fireball)
+(spacemacs/set-leader-keys "bM" 'spacemacs/switch-to-messages-buffer)
 
 (spacemacs/set-leader-keys "pa" 'projectile-find-other-file)
 (spacemacs/set-leader-keys "pA" 'projectile-find-other-file-other-window)
 
+;; highlight
+(spacemacs/set-leader-keys "hh" 'dinghmcn/highlight-dwim)
+(spacemacs/set-leader-keys "hc" 'dinghmcn/clearn-highlight)
+
 (when (spacemacs/system-is-mswindows)
   (global-set-key (kbd "s-=") 'spacemacs/scale-up-font)
+  (spacemacs/set-leader-keys "bf" 'locate-current-file-in-explorer)
   (global-set-key (kbd "s--") 'spacemacs/scale-down-font)
   (global-set-key (kbd "s-0") 'spacemacs/reset-font-size)
   (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
   (global-set-key (kbd "s-v") 'yank)
+  (global-set-key (kbd "s-g") 'evil-avy-goto-char-2)
   (global-set-key (kbd "s-c") 'evil-yank)
   (global-set-key (kbd "s-a") 'mark-whole-buffer)
   (global-set-key (kbd "s-x") 'kill-region)

@@ -9,6 +9,18 @@
 ;;
 ;;; License: GPLv3
 
+(defun dinghmcn/highlight-dwim ()
+  (interactive)
+  (if (use-region-p)
+      (progn
+        (highlight-frame-toggle)
+        (deactivate-mark))
+    (symbol-overlay-put)))
+
+(defun dinghmcn/clearn-highlight ()
+  (interactive)
+  (clear-highlight-frame)
+  (symbol-overlay-remove-all))
 ;; @see https://bitbucket.org/lyro/evil/issue/511/let-certain-minor-modes-key-bindings
 (defmacro adjust-major-mode-keymap-with-evil (m &optional r)
   `(eval-after-load (quote ,(if r r m))
@@ -16,6 +28,22 @@
         (evil-make-overriding-map ,(intern (concat m "-mode-map")) 'normal)
         ;; force update evil keymaps after git-timemachine-mode loaded
         (add-hook (quote ,(intern (concat m "-mode-hook"))) #'evil-normalize-keymaps))))
+
+(defun locate-current-file-in-explorer ()
+  (interactive)
+  (cond
+   ;; In buffers with file name
+   ((buffer-file-name)
+    (shell-command (concat "start explorer /e,/select,\"" (replace-regexp-in-string "/" "\\\\" (buffer-file-name)) "\"")))
+   ;; In dired mode
+   ((eq major-mode 'dired-mode)
+    (shell-command (concat "start explorer /e,\"" (replace-regexp-in-string "/" "\\\\" (dired-current-directory)) "\"")))
+   ;; In eshell mode
+   ((eq major-mode 'eshell-mode)
+    (shell-command (concat "start explorer /e,\"" (replace-regexp-in-string "/" "\\\\" (eshell/pwd)) "\"")))
+   ;; Use default-directory as last resource
+   (t
+    (shell-command (concat "start explorer /e,\"" (replace-regexp-in-string "/" "\\\\" default-directory) "\"")))))
 
 
 ;; insert ; at the end of current line
@@ -130,6 +158,7 @@ org-files and bookmarks"
     (candidates . (("Calendar" . (lambda ()  (browse-url "https://www.google.com/calendar/render")))
                    ("RSS" . elfeed)
                    ("Blog" . easy-hugo)
+                   ("Random Todo" . org-random-entry)
                    ("Github" . (lambda() (helm-github-stars)))
                    ("Calculator" . (lambda() (helm-calcul-expression)))
                    ("Run current flie" . (lambda () (dinghmcn/run-current-file)))
@@ -162,45 +191,6 @@ e.g. Sunday, September 17, 2000."
     reload active tab of winref
   end tell
 " )))
-
-
-(define-minor-mode
-  shadowsocks-proxy-mode
-  :global t
-  :init-value nil
-  :lighter " SS"
-  (if shadowsocks-proxy-mode
-      (setq url-gateway-method 'socks)
-    (setq url-gateway-method 'native)))
-
-
-(define-global-minor-mode
-  global-shadowsocks-proxy-mode shadowsocks-proxy-mode shadowsocks-proxy-mode
-  :group 'shadowsocks-proxy)
-
-
-;; http://blog.lojic.com/2009/08/06/send-growl-notifications-from-carbon-emacs-on-osx/
-(defun dinghmcn/growl-notification (title message &optional sticky)
-  "Send a Growl notification"
-  (do-applescript
-   (format "tell application \"GrowlHelperApp\" \n
-              notify with name \"Emacs Notification\" title \"%s\" description \"%s\" application name \"Emacs.app\" sticky \"%s\"
-              end tell
-              "
-           title
-           message
-           (if sticky "yes" "no"))))
-
-(defun dinghmcn/growl-timer (minutes message)
-  "Issue a Growl notification after specified minutes"
-  (interactive (list (read-from-minibuffer "Minutes: " "10")
-                     (read-from-minibuffer "Message: " "Reminder") ))
-  (run-at-time (* (string-to-number minutes) 60)
-               nil
-               (lambda (minute message)
-                 (dinghmcn/growl-notification "Emacs Reminder" message t))
-               minutes
-               message))
 
 (defun dinghmcn/goto-match-paren (arg)
   "Go to the matching  if on (){}[], similar to vi style of % "
@@ -439,13 +429,15 @@ With PREFIX, cd to project root."
       (message "No remote branch"))
      (t
       (browse-url
-       (format "https://github.com/%s/pull/new/%s"
-               (replace-regexp-in-string
-                "\\`.+github\\.com:\\(.+\\)\\.git\\'" "\\1"
-                (magit-get "remote"
-                           (magit-get-remote)
-                           "url"))
-               remote-branch))))))
+       (if (spacemacs/system-is-mswindows)
+           "https://git.code.oa.com/lionqu/HLMJ_js/merge_requests/new"
+         (format "https://github.com/%s/pull/new/%s"
+                 (replace-regexp-in-string
+                  "\\`.+github\\.com:\\(.+\\)\\.git\\'" "\\1"
+                  (magit-get "remote"
+                             (magit-get-remote)
+                             "url"))
+                 remote-branch)))))))
 
 (defun dinghmcn/markdown-to-html ()
   (interactive)
@@ -472,11 +464,6 @@ Error out if this isn't a GitHub repo."
                       commit)))
     (browse-url url)
     (git-messenger:popup-close)))
-
-(defun dinghmcn/search-in-fireball ()
-  (interactive)
-  (helm-do-ag (expand-file-name "~/Github/fireball/")))
-
 
 (defun dinghmcn/show-current-buffer-major-mode ()
   (interactive)

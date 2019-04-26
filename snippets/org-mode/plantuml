@@ -2,8 +2,6 @@
 # name: plantuml
 # key: plantuml
 # --
-{% plantuml %}
-@startuml
+#+BEGIN_SRC plantuml cmdline -charset utf-8 :eval never-export :exports results :file $1.png
 $0
-@enduml
-{% endplantuml %}
+#+END_SRC
